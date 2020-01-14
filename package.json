@@ -1,0 +1,22 @@
+{
+  "name": "nigel",
+  "version": "0.0.1",
+  "description": "yet another productivity app...",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js"
+  },
+  "repository": "https://github.com/jsphweid/nigel",
+  "author": "Joseph Weidinger",
+  "devDependencies": {
+    "electron": "^4.2.12",
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.0"
+  },
+  "dependencies": {
+    "active-win": "^6.0.0",
+    "run-applescript": "^4.0.0"
+  }
+}
