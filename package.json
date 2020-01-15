@@ -2,21 +2,79 @@
   "name": "nigel",
   "version": "0.0.1",
   "description": "yet another productivity app...",
+  "main": "src/main/.parcel/main.js",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "npm run build && electron ./dist/main.js"
+    "start": "run-s main:build watch",
+    "release": "run-s parcel:build \"electron:build {@}\" --",
+    "watch": "run-p -r parcel:watch electron:start",
+    "electron:start": "nodemon --watch src/main/.parcel --exec \"electron .\"",
+    "electron:build": "build --x64 --publish=never",
+    "parcel:watch": "run-p -r main:watch renderer:watch",
+    "main:watch": "parcel watch src/main/main.ts --out-dir src/main/.parcel --out-file main --target electron",
+    "renderer:watch": "parcel src/renderer/index.html --port 1124 --out-dir src/renderer/.parcel/development",
+    "parcel:build": "run-s main:build renderer:build",
+    "main:build": "parcel build src/main/main.ts --out-dir src/main/.parcel --out-file main --target electron",
+    "renderer:build": "parcel build src/renderer/index.html --public-url ./ --out-dir src/renderer/.parcel/production"
   },
   "repository": "https://github.com/jsphweid/nigel",
   "author": "Joseph Weidinger",
+  "build": {
+    "productName": "Nigel",
+    "files": [
+      "src/**",
+      "!src/main/main.ts",
+      "!src/renderer/**",
+      "src/renderer/.parcel/production/**",
+      "!src/**/*.map"
+    ],
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "artifactName": "${productName}-mac.${ext}"
+    },
+    "win": {
+      "target": [
+        "zip"
+      ],
+      "artifactName": "${productName}-win.${ext}"
+    },
+    "linux": {
+      "target": [
+        "zip"
+      ],
+      "category": "Development",
+      "artifactName": "${productName}-linux.${ext}"
+    },
+    "directories": {
+      "output": "release"
+    }
+  },
   "devDependencies": {
-    "electron": "^4.2.12",
-    "tslint": "^5.19.0",
-    "typescript": "^3.6.0"
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/react": "^16.8.22",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-router-dom": "^5.1.3",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^24.8.0",
+    "electron": "^5.0.5",
+    "electron-builder": "^20.44.4",
+    "nodemon": "^1.19.1",
+    "npm-run-all": "^4.1.5",
+    "parcel-bundler": "^1.12.3",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
+    "spectron": "^7.0.0",
+    "typescript": "^3.5.2"
   },
   "dependencies": {
     "active-win": "^6.0.0",
+    "app-root-path": "^2.2.1",
+    "electron-is-dev": "^1.1.0",
     "run-applescript": "^4.0.0"
   }
 }

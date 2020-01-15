@@ -1,3 +1,13 @@
-dist
-node_modules
-.DS_Store
+# output
+/.cache
+/coverage
+/src/renderer/.parcel
+/src/main/.parcel
+*.map
+/release
+
+# dependencies
+/node_modules
+
+# logs
+*.log
