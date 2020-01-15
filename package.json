@@ -73,9 +73,11 @@
     "typescript": "^3.5.2"
   },
   "dependencies": {
+    "@grapheng/prelude": "^14.0.0",
     "active-win": "^6.0.0",
     "app-root-path": "^2.2.1",
     "electron-is-dev": "^1.1.0",
+    "react-resize-aware": "^2.7.2",
     "run-applescript": "^4.0.0",
     "styled-components": "^5.0.0"
   }

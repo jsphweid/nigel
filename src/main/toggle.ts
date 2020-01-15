@@ -27,7 +27,7 @@ export const getActiveWindow = (): Promise<ActiveWindow | null> =>
 
 export const setupToggle = (win: BrowserWindow) => {
   const { toggleAway } = getFunctions();
-  globalShortcut.register("`", async () => {
+  globalShortcut.register("~", async () => {
     if (win.isFocused() && latestWindow) {
       toggleAway(latestWindow);
     } else {
