@@ -2,16 +2,30 @@ import * as React from "react";
 const resizeAware = require("react-resize-aware");
 const ResizeAware = resizeAware.default || resizeAware;
 
+import * as Button from "./button";
+
 import * as KeyboardKeys from "./keyboard-keys";
 import TileBackdrop from "./components/tile-backdrop";
+import DraggableButton from "./draggable-button";
+import { Coordinate } from "./types";
 
-interface Props {}
+interface Props {
+  buttons: Button.Button[];
+  handleMove: (
+    button: Button.Button,
+    destinationKey: KeyboardKeys.Key,
+    destinationTabID: string
+  ) => void;
+}
 
 interface State {
   boardHeight: number;
   boardWidth: number;
   itemHeight: number;
   itemWidth: number;
+  activeTab: string;
+  buttonThatsBeingDragged: Button.Button | null;
+  buttonThatsBeingHovered: Button.Button | null;
 }
 
 class Board extends React.Component<Props, State> {
@@ -20,12 +34,37 @@ class Board extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      buttonThatsBeingDragged: null,
+      buttonThatsBeingHovered: null,
       boardHeight: 0,
       boardWidth: 0,
       itemHeight: 0,
-      itemWidth: 0
+      itemWidth: 0,
+      activeTab: "tab1"
     };
   }
+
+  public componentDidUpdate() {
+    const { buttonThatsBeingHovered, buttonThatsBeingDragged } = this.state;
+    if (buttonThatsBeingHovered) {
+      if (buttonThatsBeingDragged) {
+        return;
+      }
+      const { id } = buttonThatsBeingHovered;
+      const possiblyNewButtonVersion = this.props.buttons.find(
+        b => b.id === id
+      );
+      if (
+        JSON.stringify(possiblyNewButtonVersion) !==
+        JSON.stringify(buttonThatsBeingHovered)
+      ) {
+        this.setState({
+          buttonThatsBeingHovered: possiblyNewButtonVersion || null
+        });
+      }
+    }
+  }
+
   private handleResize = (size: { width: number; height: number }) => {
     if (!size.width) return;
 
@@ -37,7 +76,62 @@ class Board extends React.Component<Props, State> {
     });
   };
 
+  private handleButtonDragStop = (coordinate: Coordinate) => {
+    const { buttonThatsBeingHovered } = this.state;
+    const { boardHeight, boardWidth } = this.state;
+    const keyboardKeyDestination = KeyboardKeys.determineKeyboardKeyDestination(
+      boardWidth,
+      boardHeight,
+      coordinate
+    );
+
+    if (buttonThatsBeingHovered && keyboardKeyDestination) {
+      this.props.handleMove(
+        buttonThatsBeingHovered,
+        keyboardKeyDestination,
+        this.state.activeTab
+      );
+    }
+    this.setState({ buttonThatsBeingDragged: null });
+  };
+
+  // This should really only be ran when the props change
+  private getStaticButtonsDisplaying = () =>
+    this.props.buttons.filter(
+      button =>
+        button.type === Button.Type.Tab || button.tabID === this.state.activeTab
+      // (!this.state.buttonThatsBeingHovered ||
+      //   button.id !== this.state.buttonThatsBeingHovered.id)
+    );
+
+  private renderButton = (button: Button.Button) => {
+    const { itemHeight, itemWidth } = this.state;
+    const coords = KeyboardKeys.Coordinates.getCoordsFromKey(
+      button.keyboardKey
+    );
+    const x = coords.x * itemWidth;
+    const y = coords.y * itemHeight;
+    return (
+      <DraggableButton
+        key={button.id}
+        button={button}
+        display={{ x, y, height: itemHeight, width: itemWidth }}
+        onDragStop={this.handleButtonDragStop}
+        onMouseEnter={() => this.setState({ buttonThatsBeingHovered: button })}
+      />
+    );
+  };
+
+  // private renderPossibleHoveredButton = () =>
+  //   pipe(
+  //     this.state.buttonThatsBeingHovered,
+  //     Option.fromNullable,
+  //     Option.fold(Fn.constNull, this.renderButton)
+  //   );
+
   public render() {
+    const buttonsToDisplay = this.getStaticButtonsDisplaying();
+
     return (
       <ResizeAware
         ref={(el: any) => (this.els.board = el)}
@@ -54,6 +148,7 @@ class Board extends React.Component<Props, State> {
           keyWidth={this.state.itemWidth}
           keyHeight={this.state.itemHeight}
         />
+        {buttonsToDisplay.map(this.renderButton)}
       </ResizeAware>
     );
   }
