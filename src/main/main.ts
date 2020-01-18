@@ -3,7 +3,7 @@ import { BrowserWindow, app } from "electron";
 import isDev from "electron-is-dev";
 const { resolve } = require("app-root-path");
 
-import { setupToggle } from "./toggle";
+import * as Toggle from "./toggle";
 
 app.on("ready", async () => {
   const mainWindow = new BrowserWindow({
@@ -22,7 +22,7 @@ app.on("ready", async () => {
     }
   });
 
-  setupToggle(mainWindow);
+  await Toggle.setup(mainWindow);
 
   const devPath = "http://localhost:1124";
   const prodPath = format({

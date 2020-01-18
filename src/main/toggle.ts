@@ -2,9 +2,8 @@ import ActiveWin from "active-win";
 import { BrowserWindow, globalShortcut } from "electron";
 
 import * as Execution from "./execution";
+import * as Types from "../shared/types";
 import { thisOS, OS } from "./os";
-
-let latestWindow: ActiveWindow | null = null;
 
 interface ActiveWindow {
   windowTitle: string;
@@ -12,7 +11,10 @@ interface ActiveWindow {
   processID: number;
 }
 
-export const getActiveWindow = (): Promise<ActiveWindow | null> =>
+let lastActiveWindow: ActiveWindow | null = null;
+let nigelWindow: BrowserWindow | null = null;
+
+const getActiveWindow = (): Promise<ActiveWindow | null> =>
   // TODO: Figure out a way to make this go faster...
   // idea: stick an application and only unstick when the uses says so
   ActiveWin().then(result =>
@@ -25,40 +27,46 @@ export const getActiveWindow = (): Promise<ActiveWindow | null> =>
       : null
   );
 
-export const setupToggle = (win: BrowserWindow) => {
-  const { toggleAway } = getFunctions();
-  globalShortcut.register("~", async () => {
-    if (win.isFocused() && latestWindow) {
-      toggleAway(latestWindow);
-    } else {
-      latestWindow = await getActiveWindow();
+export const setup = (win: BrowserWindow) => {
+  nigelWindow = win;
 
-      win.focus();
+  globalShortcut.register("~", async () => {
+    if (win.isFocused()) {
+      awayFromNigel();
+    } else {
+      lastActiveWindow = await getActiveWindow();
+      toNigel();
     }
   });
 };
 
-interface Thing {
-  toggleAway(activeWindow: ActiveWindow): void;
-}
+export const toNigel = () =>
+  nigelWindow
+    ? nigelWindow.focus()
+    : console.error(
+        "Can't focus Nigel because it hasn't been initialized yet."
+      );
 
-const getFunctions = (): Thing => {
-  switch (thisOS) {
-    case OS.MAC:
-      return {
-        toggleAway: activeWindow =>
-          Execution.execute({
-            type: Execution.Type.AppleScript,
-            script: `
-              tell application \"System Events\"
-              set frontmost of the first process whose unix id is ${activeWindow.processID} to true
-              end tell
-            `
-          })
-      };
-    default:
-      return {
-        toggleAway: () => console.error("Can't support this OS yet.")
-      };
+export const awayFromNigel = (): Promise<any> => {
+  if (lastActiveWindow) {
+    switch (thisOS) {
+      case OS.MAC:
+        return Execution.executeOnly({
+          type: Types.Execution.Type.AppleScript,
+          script: `
+            tell application \"System Events\"
+            set frontmost of the first process whose unix id is ${lastActiveWindow.processID} to true
+            end tell
+          `
+        });
+      default:
+        return Promise.reject(
+          "Can't toggle away because this OS doesn't support that."
+        );
+    }
   }
+
+  return Promise.reject(
+    "Can't toggle away from Nigel because there was no last active window."
+  );
 };
