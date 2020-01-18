@@ -1,5 +1,5 @@
 import * as KeyboardKeys from "./keyboard-keys";
-import * as Execution from "../execution";
+import * as Types from "../shared/types";
 
 export enum Type {
   Tab,
@@ -15,7 +15,7 @@ interface Base {
 
 export interface Action extends Base {
   type: Type.Action;
-  executionData: Execution.Data;
+  executionData: Types.Execution.Data;
   tabID: string;
 }
 

@@ -3,9 +3,10 @@ import styled, { createGlobalStyle } from "styled-components";
 
 import Board from "./board";
 import * as Button from "./button";
-import * as Execution from "../execution";
+import * as RendererExecutor from "./renderer-executor";
 import * as KeyboardKeys from "./keyboard-keys";
-import { generateRandomId } from "./utils";
+import * as Utils from "./utils";
+import * as Types from "../shared/types";
 
 const Container = styled.div``;
 
@@ -16,8 +17,8 @@ export const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const tab1ID = generateRandomId();
-const tab2ID = generateRandomId();
+const tab1ID = Utils.generateRandomId();
+const tab2ID = Utils.generateRandomId();
 
 let mockButtons: Button.Button[] = [
   {
@@ -33,20 +34,26 @@ let mockButtons: Button.Button[] = [
     keyboardKey: "3"
   },
   {
-    id: generateRandomId(),
+    id: Utils.generateRandomId(),
     type: Button.Type.Action,
     name: "Some Action 1",
     keyboardKey: "q",
     tabID: tab1ID,
-    executionData: { type: Execution.Type.AppleScript, script: "" }
+    executionData: {
+      type: Types.Execution.Type.AppleScript,
+      script: `display dialog "Hello World"`
+    }
   },
   {
-    id: generateRandomId(),
+    id: Utils.generateRandomId(),
     type: Button.Type.Action,
     name: "Another action...",
     keyboardKey: "w",
     tabID: tab2ID,
-    executionData: { type: Execution.Type.BashScript, script: "" }
+    executionData: {
+      type: Types.Execution.Type.ShellScript,
+      script: "touch ~/Desktop/thing.txt"
+    }
   }
 ];
 
@@ -102,7 +109,7 @@ const App = () => {
           )
         }
         handleActionButtonClicked={button =>
-          Execution.execute(button.executionData)
+          RendererExecutor.execute(button.executionData)
         }
       />
     </div>

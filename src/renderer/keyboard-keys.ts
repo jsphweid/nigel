@@ -1,5 +1,3 @@
-import { pipe } from "@grapheng/prelude";
-
 import { Coordinate } from "./types";
 
 export type Key =

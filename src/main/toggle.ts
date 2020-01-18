@@ -1,7 +1,7 @@
 import ActiveWin from "active-win";
 import { BrowserWindow, globalShortcut } from "electron";
 
-import * as Execution from "../execution";
+import * as Execution from "./execution";
 import { thisOS, OS } from "./os";
 
 let latestWindow: ActiveWindow | null = null;
