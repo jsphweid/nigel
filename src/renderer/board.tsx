@@ -70,7 +70,7 @@ class Board extends React.Component<Props, State> {
               )
             )
         }),
-        {}
+        {} as KeyboardKeys.KeyListenerCallbackMap
       )
     );
   }
