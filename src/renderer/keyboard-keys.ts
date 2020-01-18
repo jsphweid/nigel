@@ -29,6 +29,8 @@ export const arrangement: Key[][] = [
   ["z", "x", "c", "v", "b"]
 ];
 
+export const all = arrangement.flat();
+
 export const numHigh = arrangement.length;
 export const numWide = arrangement[0].length;
 

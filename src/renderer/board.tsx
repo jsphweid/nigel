@@ -1,9 +1,10 @@
 import * as React from "react";
 const resizeAware = require("react-resize-aware");
 const ResizeAware = resizeAware.default || resizeAware;
+import { Option, Fn, pipe } from "@grapheng/prelude";
+import hotkeys from "hotkeys-js";
 
 import * as Button from "./button";
-
 import * as KeyboardKeys from "./keyboard-keys";
 import TileBackdrop from "./components/tile-backdrop";
 import DraggableButton from "./draggable-button";
@@ -43,6 +44,21 @@ class Board extends React.Component<Props, State> {
       itemWidth: 0,
       activeTabID: props.buttons.find(b => Button.isTab(b))?.id || ""
     };
+
+    KeyboardKeys.all.forEach(key =>
+      hotkeys(key, () =>
+        pipe(
+          Option.fromNullable(
+            this.getStaticButtonsDisplaying().find(
+              button => button.keyboardKey === key
+            )
+          ),
+          Option.fold(Fn.constVoid, button =>
+            this.handleButtonActivated(button)
+          )
+        )
+      )
+    );
   }
 
   public componentDidUpdate() {
@@ -102,9 +118,15 @@ class Board extends React.Component<Props, State> {
       button =>
         button.type === Button.Type.Tab ||
         button.tabID === this.state.activeTabID
-      // (!this.state.buttonThatsBeingHovered ||
-      //   button.id !== this.state.buttonThatsBeingHovered.id)
     );
+
+  private handleButtonActivated = (button: Button.Button) => {
+    if (Button.isTab(button)) {
+      this.setState({ activeTabID: button.id });
+    } else {
+      this.props.handleActionButtonClicked(button);
+    }
+  };
 
   private renderButton = (button: Button.Button) => {
     const { itemHeight, itemWidth } = this.state;
@@ -121,23 +143,10 @@ class Board extends React.Component<Props, State> {
         active={button.id === this.state.activeTabID}
         onDragStop={this.handleButtonDragStop}
         onMouseEnter={() => this.setState({ buttonThatsBeingHovered: button })}
-        onClick={() => {
-          if (Button.isTab(button)) {
-            this.setState({ activeTabID: button.id });
-          } else {
-            this.props.handleActionButtonClicked(button);
-          }
-        }}
+        onClick={() => this.handleButtonActivated(button)}
       />
     );
   };
-
-  // private renderPossibleHoveredButton = () =>
-  //   pipe(
-  //     this.state.buttonThatsBeingHovered,
-  //     Option.fromNullable,
-  //     Option.fold(Fn.constNull, this.renderButton)
-  //   );
 
   public render() {
     const buttonsToDisplay = this.getStaticButtonsDisplaying();

@@ -78,6 +78,7 @@
     "active-win": "^6.0.0",
     "app-root-path": "^2.2.1",
     "electron-is-dev": "^1.1.0",
+    "hotkeys-js": "^3.7.3",
     "react-draggable": "^4.2.0",
     "react-icons": "^3.8.0",
     "react-resize-aware": "^2.7.2",
