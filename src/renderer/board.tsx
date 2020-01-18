@@ -6,6 +6,7 @@ import hotkeys from "hotkeys-js";
 
 import * as Button from "./button";
 import * as KeyboardKeys from "./keyboard-keys";
+import * as Utils from "./utils";
 import TileBackdrop from "./components/tile-backdrop";
 import DraggableButton from "./draggable-button";
 import { Coordinate } from "./types";
@@ -20,6 +21,11 @@ interface Props {
   handleActionButtonClicked: (button: Button.Action) => void;
 }
 
+interface ButtonsView {
+  all: Button.Button[];
+  byKeyboardKey: Map<KeyboardKeys.Key, Button.Button>;
+}
+
 interface State {
   boardHeight: number;
   boardWidth: number;
@@ -28,6 +34,7 @@ interface State {
   activeTabID: string;
   buttonThatsBeingDragged: Button.Button | null;
   buttonThatsBeingHovered: Button.Button | null;
+  buttonsView: ButtonsView;
 }
 
 class Board extends React.Component<Props, State> {
@@ -35,6 +42,9 @@ class Board extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
+    const activeTabID = props.buttons.find(b => Button.isTab(b))?.id || "";
+
     this.state = {
       buttonThatsBeingDragged: null,
       buttonThatsBeingHovered: null,
@@ -42,17 +52,14 @@ class Board extends React.Component<Props, State> {
       boardWidth: 0,
       itemHeight: 0,
       itemWidth: 0,
-      activeTabID: props.buttons.find(b => Button.isTab(b))?.id || ""
+      activeTabID,
+      buttonsView: this.makeComputedButtonsView(props.buttons, activeTabID)
     };
 
     KeyboardKeys.all.forEach(key =>
       hotkeys(key, () =>
         pipe(
-          Option.fromNullable(
-            this.getStaticButtonsDisplaying().find(
-              button => button.keyboardKey === key
-            )
-          ),
+          Option.fromNullable(this.state.buttonsView.byKeyboardKey.get(key)),
           Option.fold(Fn.constVoid, button =>
             this.handleButtonActivated(button)
           )
@@ -61,7 +68,7 @@ class Board extends React.Component<Props, State> {
     );
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(previousProps: Props, previousState: State) {
     const { buttonThatsBeingHovered, buttonThatsBeingDragged } = this.state;
     if (buttonThatsBeingHovered) {
       if (buttonThatsBeingDragged) {
@@ -71,16 +78,44 @@ class Board extends React.Component<Props, State> {
       const possiblyNewButtonVersion = this.props.buttons.find(
         b => b.id === id
       );
-      if (
-        JSON.stringify(possiblyNewButtonVersion) !==
-        JSON.stringify(buttonThatsBeingHovered)
-      ) {
+      if (!Utils.isEqual(possiblyNewButtonVersion, buttonThatsBeingHovered)) {
         this.setState({
           buttonThatsBeingHovered: possiblyNewButtonVersion || null
         });
       }
     }
+
+    if (
+      !Utils.isEqual(previousProps.buttons, this.props.buttons) ||
+      !Utils.isEqual(previousState.activeTabID, this.state.activeTabID)
+    ) {
+      this.setState({
+        buttonsView: this.makeComputedButtonsView(
+          this.props.buttons,
+          this.state.activeTabID
+        )
+      });
+    }
   }
+
+  private makeComputedButtonsView = (
+    buttons: Button.Button[],
+    activeTabID: string
+  ): ButtonsView =>
+    pipe(
+      buttons,
+      buttons =>
+        buttons.filter(
+          button =>
+            button.type === Button.Type.Tab || button.tabID === activeTabID
+        ),
+      filteredButtons => ({
+        all: filteredButtons,
+        byKeyboardKey: new Map(
+          filteredButtons.map(button => [button.keyboardKey, button])
+        )
+      })
+    );
 
   private handleResize = (size: { width: number; height: number }) => {
     if (!size.width) return;
@@ -112,14 +147,6 @@ class Board extends React.Component<Props, State> {
     this.setState({ buttonThatsBeingDragged: null });
   };
 
-  // This should really only be ran when the props change
-  private getStaticButtonsDisplaying = () =>
-    this.props.buttons.filter(
-      button =>
-        button.type === Button.Type.Tab ||
-        button.tabID === this.state.activeTabID
-    );
-
   private handleButtonActivated = (button: Button.Button) => {
     if (Button.isTab(button)) {
       this.setState({ activeTabID: button.id });
@@ -149,7 +176,7 @@ class Board extends React.Component<Props, State> {
   };
 
   public render() {
-    const buttonsToDisplay = this.getStaticButtonsDisplaying();
+    const buttonsToDisplay = this.state.buttonsView.all;
 
     return (
       <ResizeAware
