@@ -1,7 +1,7 @@
 import ActiveWin from "active-win";
 import { BrowserWindow, globalShortcut } from "electron";
-import runAppleScript from "run-applescript";
 
+import * as Execution from "../execution";
 import { thisOS, OS } from "./os";
 
 let latestWindow: ActiveWindow | null = null;
@@ -47,11 +47,14 @@ const getFunctions = (): Thing => {
     case OS.MAC:
       return {
         toggleAway: activeWindow =>
-          runAppleScript(`
-                tell application \"System Events\"
-                set frontmost of the first process whose unix id is ${activeWindow.processID} to true
-                end tell
-              `)
+          Execution.execute({
+            type: Execution.Type.AppleScript,
+            script: `
+              tell application \"System Events\"
+              set frontmost of the first process whose unix id is ${activeWindow.processID} to true
+              end tell
+            `
+          })
       };
     default:
       return {

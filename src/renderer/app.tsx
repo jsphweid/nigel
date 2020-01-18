@@ -3,7 +3,7 @@ import styled, { createGlobalStyle } from "styled-components";
 
 import Board from "./board";
 import * as Button from "./button";
-import * as Execution from "./execution";
+import * as Execution from "../execution";
 import * as KeyboardKeys from "./keyboard-keys";
 import { generateRandomId } from "./utils";
 
@@ -16,15 +16,18 @@ export const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const tab1ID = generateRandomId();
+const tab2ID = generateRandomId();
+
 let mockButtons: Button.Button[] = [
   {
-    id: generateRandomId(),
+    id: tab1ID,
     type: Button.Type.Tab,
     name: "Tab 1",
     keyboardKey: "1"
   },
   {
-    id: generateRandomId(),
+    id: tab2ID,
     type: Button.Type.Tab,
     name: "Tab 2",
     keyboardKey: "3"
@@ -34,7 +37,7 @@ let mockButtons: Button.Button[] = [
     type: Button.Type.Action,
     name: "Some Action 1",
     keyboardKey: "q",
-    tabID: "tab1",
+    tabID: tab1ID,
     executionData: { type: Execution.Type.AppleScript, script: "" }
   },
   {
@@ -42,7 +45,7 @@ let mockButtons: Button.Button[] = [
     type: Button.Type.Action,
     name: "Another action...",
     keyboardKey: "w",
-    tabID: "tab2",
+    tabID: tab2ID,
     executionData: { type: Execution.Type.BashScript, script: "" }
   }
 ];
@@ -93,10 +96,13 @@ const App = () => {
       <GlobalStyles />
       <Board
         buttons={buttons}
-        handleMove={(button, destinationKey, destinationTabID) =>
+        handleButtonMoved={(button, destinationKey, destinationTabID) =>
           setButtons(
             moveButton(buttons, button, destinationKey, destinationTabID)
           )
+        }
+        handleActionButtonClicked={button =>
+          Execution.execute(button.executionData)
         }
       />
     </div>

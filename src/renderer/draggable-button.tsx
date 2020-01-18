@@ -38,18 +38,12 @@ const BigButton = styled.button`
   cursor: pointer;
 `;
 
-interface DraggableProps {
-  style?: any;
-  className?: string;
-  onTouchEnd?: any;
-  onTouchStart?: any;
-  onMouseUp?: any;
-  onMouseDown?: any;
-  onClick?: any;
-  selected?: boolean;
-}
+const PressedBigButton = styled(BigButton)`
+  opacity: 0.2;
+  cursor: default;
+`;
 
-interface DraggableButtonProps extends DraggableProps {
+interface DraggableButtonProps {
   button: Button.Button;
   display: {
     height: number;
@@ -59,6 +53,8 @@ interface DraggableButtonProps extends DraggableProps {
   };
   onMouseEnter: () => void;
   onDragStop: (coordinate: Coordinate) => void;
+  onClick: () => void;
+  active: boolean;
 }
 
 const defaultDisplayProps = {
@@ -71,7 +67,13 @@ const defaultDisplayProps = {
 // TODO: maybe we never need default?
 const DraggableButton: React.SFC<DraggableButtonProps> = props => {
   const { height, width, x, y } = props.display || defaultDisplayProps;
-  const { button } = props;
+  const { button, onDragStop, onMouseEnter, onClick, active } = props;
+
+  const BigButtonComponent = active ? (
+    <PressedBigButton>{button.name}</PressedBigButton>
+  ) : (
+    <BigButton onClick={onClick}>{button.name}</BigButton>
+  );
 
   return (
     <Draggable
@@ -79,10 +81,10 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
       bounds="parent"
       handle=".handle"
       position={{ x: 0, y: 0 }}
-      onStop={(e: any) => props.onDragStop({ x: e.pageX, y: e.pageY })}
+      onStop={(e: any) => onDragStop({ x: e.pageX, y: e.pageY })}
     >
       <Container
-        onMouseEnter={props.onMouseEnter}
+        onMouseEnter={onMouseEnter}
         style={{
           height: `${height}px`,
           width: `${width}px`,
@@ -96,9 +98,7 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
           <Icons.Hamburger className="handle" />
           <Icons.Close onClick={() => console.log("click")} />
         </ClickableIconRow>
-        <BigButton onClick={() => console.log("big button clicked")}>
-          {button.name}
-        </BigButton>
+        {BigButtonComponent}
       </Container>
     </Draggable>
   );

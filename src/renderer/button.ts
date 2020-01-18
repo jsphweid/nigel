@@ -1,5 +1,5 @@
 import * as KeyboardKeys from "./keyboard-keys";
-import * as Execution from "./execution";
+import * as Execution from "../execution";
 
 export enum Type {
   Tab,

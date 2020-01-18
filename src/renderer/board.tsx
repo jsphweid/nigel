@@ -11,11 +11,12 @@ import { Coordinate } from "./types";
 
 interface Props {
   buttons: Button.Button[];
-  handleMove: (
+  handleButtonMoved: (
     button: Button.Button,
     destinationKey: KeyboardKeys.Key,
     destinationTabID: string
   ) => void;
+  handleActionButtonClicked: (button: Button.Action) => void;
 }
 
 interface State {
@@ -23,7 +24,7 @@ interface State {
   boardWidth: number;
   itemHeight: number;
   itemWidth: number;
-  activeTab: string;
+  activeTabID: string;
   buttonThatsBeingDragged: Button.Button | null;
   buttonThatsBeingHovered: Button.Button | null;
 }
@@ -40,7 +41,7 @@ class Board extends React.Component<Props, State> {
       boardWidth: 0,
       itemHeight: 0,
       itemWidth: 0,
-      activeTab: "tab1"
+      activeTabID: props.buttons.find(b => Button.isTab(b))?.id || ""
     };
   }
 
@@ -86,10 +87,10 @@ class Board extends React.Component<Props, State> {
     );
 
     if (buttonThatsBeingHovered && keyboardKeyDestination) {
-      this.props.handleMove(
+      this.props.handleButtonMoved(
         buttonThatsBeingHovered,
         keyboardKeyDestination,
-        this.state.activeTab
+        this.state.activeTabID
       );
     }
     this.setState({ buttonThatsBeingDragged: null });
@@ -99,7 +100,8 @@ class Board extends React.Component<Props, State> {
   private getStaticButtonsDisplaying = () =>
     this.props.buttons.filter(
       button =>
-        button.type === Button.Type.Tab || button.tabID === this.state.activeTab
+        button.type === Button.Type.Tab ||
+        button.tabID === this.state.activeTabID
       // (!this.state.buttonThatsBeingHovered ||
       //   button.id !== this.state.buttonThatsBeingHovered.id)
     );
@@ -116,8 +118,16 @@ class Board extends React.Component<Props, State> {
         key={button.id}
         button={button}
         display={{ x, y, height: itemHeight, width: itemWidth }}
+        active={button.id === this.state.activeTabID}
         onDragStop={this.handleButtonDragStop}
         onMouseEnter={() => this.setState({ buttonThatsBeingHovered: button })}
+        onClick={() => {
+          if (Button.isTab(button)) {
+            this.setState({ activeTabID: button.id });
+          } else {
+            this.props.handleActionButtonClicked(button);
+          }
+        }}
       />
     );
   };
