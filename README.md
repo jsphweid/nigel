@@ -5,3 +5,4 @@ Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate te
 #### TODO:
 
 - default tab
+- how do I make this secure?

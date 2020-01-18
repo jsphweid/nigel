@@ -2,8 +2,8 @@ import * as KeyboardKeys from "./keyboard-keys";
 import * as Types from "../shared/types";
 
 export enum Type {
-  Tab,
-  Action
+  Tab = "TAB",
+  Action = "ACTION"
 }
 
 interface Base {

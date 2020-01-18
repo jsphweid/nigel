@@ -56,14 +56,21 @@ class Board extends React.Component<Props, State> {
       buttonsView: this.makeComputedButtonsView(props.buttons, activeTabID)
     };
 
-    KeyboardKeys.all.forEach(key =>
-      hotkeys(key, () =>
-        pipe(
-          Option.fromNullable(this.state.buttonsView.byKeyboardKey.get(key)),
-          Option.fold(Fn.constVoid, button =>
-            this.handleButtonActivated(button)
-          )
-        )
+    KeyboardKeys.initKeyListeners(
+      KeyboardKeys.all.reduce(
+        (previous, key) => ({
+          ...previous,
+          [key]: () =>
+            pipe(
+              Option.fromNullable(
+                this.state.buttonsView.byKeyboardKey.get(key)
+              ),
+              Option.fold(Fn.constVoid, button =>
+                this.handleButtonActivated(button)
+              )
+            )
+        }),
+        {}
       )
     );
   }

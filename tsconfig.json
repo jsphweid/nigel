@@ -5,6 +5,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "resolveJsonModule": true
   }
 }

@@ -1,14 +1,11 @@
 export namespace Execution {
   export enum Type {
-    AppleScript,
-    ShellScript
+    AppleScript = "APPLESCRIPT",
+    ShellScript = "SHELLSCRIPT"
   }
 
   export interface Base {
     type: Type;
-    // run: () => any;
-    // integrityHash: string
-    // id: string
   }
 
   // Bash Script

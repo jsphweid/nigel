@@ -5,8 +5,7 @@ import Board from "./board";
 import * as Button from "./button";
 import * as RendererExecutor from "./renderer-executor";
 import * as KeyboardKeys from "./keyboard-keys";
-import * as Utils from "./utils";
-import * as Types from "../shared/types";
+import mockFinaleBoard from "./finale-board.json";
 
 const Container = styled.div``;
 
@@ -16,46 +15,6 @@ export const GlobalStyles = createGlobalStyle`
     padding: 0;
   }
 `;
-
-const tab1ID = Utils.generateRandomId();
-const tab2ID = Utils.generateRandomId();
-
-let mockButtons: Button.Button[] = [
-  {
-    id: tab1ID,
-    type: Button.Type.Tab,
-    name: "Tab 1",
-    keyboardKey: "1"
-  },
-  {
-    id: tab2ID,
-    type: Button.Type.Tab,
-    name: "Tab 2",
-    keyboardKey: "3"
-  },
-  {
-    id: Utils.generateRandomId(),
-    type: Button.Type.Action,
-    name: "Some Action 1",
-    keyboardKey: "q",
-    tabID: tab1ID,
-    executionData: {
-      type: Types.Execution.Type.AppleScript,
-      script: `display dialog "Hello World"`
-    }
-  },
-  {
-    id: Utils.generateRandomId(),
-    type: Button.Type.Action,
-    name: "Another action...",
-    keyboardKey: "w",
-    tabID: tab2ID,
-    executionData: {
-      type: Types.Execution.Type.ShellScript,
-      script: "touch ~/Desktop/thing.txt"
-    }
-  }
-];
 
 export const moveButton = (
   buttons: Button.Button[],
@@ -95,9 +54,12 @@ export const moveButton = (
 
   return buttonsClone;
 };
+console.log("mockFinaleBoard", mockFinaleBoard);
 
 const App = () => {
-  const [buttons, setButtons] = React.useState(mockButtons);
+  const [buttons, setButtons] = React.useState(
+    mockFinaleBoard as Button.Button[]
+  );
   return (
     <div>
       <GlobalStyles />
