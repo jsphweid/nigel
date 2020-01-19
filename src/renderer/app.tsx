@@ -54,7 +54,6 @@ export const moveButton = (
 
   return buttonsClone;
 };
-console.log("mockFinaleBoard", mockFinaleBoard);
 
 const App = () => {
   const [buttons, setButtons] = React.useState(

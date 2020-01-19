@@ -51,7 +51,7 @@ export const awayFromNigel = (): Promise<any> => {
   if (lastActiveWindow) {
     switch (thisOS) {
       case OS.MAC:
-        return Execution.executeOnly({
+        return Execution.execute({
           type: Types.Execution.Type.AppleScript,
           script: `
             tell application \"System Events\"

@@ -1,7 +1,8 @@
 export namespace Execution {
   export enum Type {
     AppleScript = "APPLESCRIPT",
-    ShellScript = "SHELLSCRIPT"
+    ShellScript = "SHELLSCRIPT",
+    JXA = "JXA"
   }
 
   export interface Base {
@@ -26,5 +27,13 @@ export namespace Execution {
   export const isAppleScript = (data: Data): data is AppleScript =>
     data.type === Type.AppleScript;
 
-  export type Data = AppleScript | ShellScript;
+  // JXA
+  export interface JXA extends Base {
+    type: Type.JXA;
+    script: string;
+  }
+
+  export const isJXA = (data: Data): data is JXA => data.type === Type.JXA;
+
+  export type Data = AppleScript | ShellScript | JXA;
 }

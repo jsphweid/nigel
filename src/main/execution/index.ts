@@ -1,29 +1,27 @@
 import { ipcMain } from "electron";
 
 import * as Types from "../../shared/types";
-import * as Toggle from "../toggle";
 import * as AppleScript from "./applescript";
 import * as ShellScript from "./shell-script";
+import * as JXA from "./jxa";
 
 ipcMain.on("execute", async (event: any, data: Types.Execution.Data) => {
-  const result = await toggleAndExecute(data);
+  const result = await execute(data);
   event.sender.send("execution-result", null, result);
 });
 
-export const executeOnly = (data: Types.Execution.Data): Promise<any> => {
+export const execute = (data: Types.Execution.Data): Promise<any> => {
   switch (data.type) {
     case Types.Execution.Type.AppleScript:
       return AppleScript.run(data);
     case Types.Execution.Type.ShellScript:
       return ShellScript.run(data);
+    case Types.Execution.Type.JXA:
+      return JXA.run(data);
     default:
+      console.error(
+        `Unable to execute script because ${data} doesn't have a handler.`
+      );
       return Promise.resolve(null);
   }
-};
-
-export const toggleAndExecute = async (
-  data: Types.Execution.Data
-): Promise<any> => {
-  await Toggle.awayFromNigel();
-  return executeOnly(data);
 };

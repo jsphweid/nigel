@@ -32,5 +32,16 @@
       "type": "SHELLSCRIPT",
       "script": "touch ~/Desktop/thing.txt"
     }
+  },
+  {
+    "id": "9feb0ced-019a-49d3-b200-aa7312d15a6b",
+    "type": "ACTION",
+    "name": "Another action...",
+    "keyboardKey": "z",
+    "tabID": "tab1",
+    "executionData": {
+      "type": "JXA",
+      "script": "HelperV1()\r\n  .activate(\"Finale\")\r\n  .clickMenuItems([\r\n    \"Plug-ins\",\r\n    \"Note, Beam, and Rest Editing\",\r\n    \"Patterson Plug-Ins Lite\",\r\n    \"Patterson Beams...\"\r\n  ]);\r\n"
+    }
   }
 ]
