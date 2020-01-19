@@ -2,6 +2,11 @@
 
 Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate template. Look there if ever writing tests
 
+#### BUGS:
+
+- fix drag while changing tabs
+- no selection on buttons
+
 #### TODO:
 
 - default tab
