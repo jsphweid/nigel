@@ -2,9 +2,9 @@ import * as React from "react";
 const resizeAware = require("react-resize-aware");
 const ResizeAware = resizeAware.default || resizeAware;
 import { Option, Fn, pipe } from "@grapheng/prelude";
-import hotkeys from "hotkeys-js";
 
-import * as Button from "./button";
+import { Button } from "../shared/types";
+import { KeyboardKeys as KeyboardKeysTypes } from "../shared/types";
 import * as KeyboardKeys from "./keyboard-keys";
 import * as Utils from "./utils";
 import TileBackdrop from "./components/tile-backdrop";
@@ -15,15 +15,17 @@ interface Props {
   buttons: Button.Button[];
   handleButtonMoved: (
     button: Button.Button,
-    destinationKey: KeyboardKeys.Key,
+    destinationKey: KeyboardKeysTypes.Key,
     destinationTabID: string
   ) => void;
   handleActionButtonClicked: (button: Button.Action) => void;
+  handleEditButtonClicked: (button: Button.Button) => void;
+  handleDeleteButtonClicked: (button: Button.Button) => void;
 }
 
 interface ButtonsView {
   all: Button.Button[];
-  byKeyboardKey: Map<KeyboardKeys.Key, Button.Button>;
+  byKeyboardKey: Map<KeyboardKeysTypes.Key, Button.Button>;
 }
 
 interface State {
@@ -178,6 +180,8 @@ class Board extends React.Component<Props, State> {
         onDragStop={this.handleButtonDragStop}
         onMouseEnter={() => this.setState({ buttonThatsBeingHovered: button })}
         onClick={() => this.handleButtonActivated(button)}
+        onEditButtonClick={() => this.props.handleEditButtonClicked(button)}
+        onDeleteButtonClick={() => this.props.handleDeleteButtonClicked(button)}
       />
     );
   };

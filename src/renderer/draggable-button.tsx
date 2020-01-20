@@ -2,7 +2,7 @@ import * as React from "react";
 import Draggable from "react-draggable";
 import styled from "styled-components";
 
-import * as Button from "./button";
+import { Button } from "../shared/types";
 import * as Icons from "./icons";
 import { Coordinate } from "./types";
 
@@ -54,6 +54,8 @@ interface DraggableButtonProps {
   onMouseEnter: () => void;
   onDragStop: (coordinate: Coordinate) => void;
   onClick: () => void;
+  onEditButtonClick: () => void;
+  onDeleteButtonClick: () => void;
   active: boolean;
 }
 
@@ -94,9 +96,9 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
         }}
       >
         <ClickableIconRow>
-          <Icons.Edit onClick={() => console.log("edit clicked")} />
+          <Icons.Edit onClick={props.onEditButtonClick} />
           <Icons.Hamburger className="handle" />
-          <Icons.Close onClick={() => console.log("click")} />
+          <Icons.Close onClick={props.onDeleteButtonClick} />
         </ClickableIconRow>
         {BigButtonComponent}
       </Container>

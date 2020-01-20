@@ -9,6 +9,7 @@ Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate te
 
 #### TODO:
 
+- introduce concept of boards
 - default tab
 - how do I make this secure?
 - how do I organize buttons, executions?

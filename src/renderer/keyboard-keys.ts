@@ -1,28 +1,8 @@
+import { KeyboardKeys } from "../shared/types";
+
 import { Coordinate } from "./types";
 
-export type Key =
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "q"
-  | "w"
-  | "e"
-  | "r"
-  | "t"
-  | "a"
-  | "s"
-  | "d"
-  | "f"
-  | "g"
-  | "z"
-  | "x"
-  | "c"
-  | "v"
-  | "b";
-
-export const arrangement: Key[][] = [
+export const arrangement: KeyboardKeys.Key[][] = [
   ["1", "2", "3", "4", "5"],
   ["q", "w", "e", "r", "t"],
   ["a", "s", "d", "f", "g"],
@@ -72,7 +52,7 @@ export function determineKeyboardKeyDestination(
   return position ? Coordinates.getKeyFromCoords(position) : null;
 }
 
-const keyState = new Map<Key, boolean>();
+const keyState = new Map<KeyboardKeys.Key, boolean>();
 
 const passesKeyDownValidation = (e: any): boolean =>
   // TODO: in the future, have a different system for
@@ -86,7 +66,7 @@ const passesKeyDownValidation = (e: any): boolean =>
 const passesKeyUpValidation = (e: any): boolean =>
   keyState.get(e.key) !== undefined;
 
-export type KeyListenerCallbackMap = { [key in Key]: () => void };
+export type KeyListenerCallbackMap = { [key in KeyboardKeys.Key]: () => void };
 
 export function initKeyListeners(keyCallbackMap: KeyListenerCallbackMap) {
   if (typeof window === "undefined") {
@@ -95,7 +75,7 @@ export function initKeyListeners(keyCallbackMap: KeyListenerCallbackMap) {
     );
     return;
   }
-  const keysToListenFor = Object.keys(keyCallbackMap) as Key[];
+  const keysToListenFor = Object.keys(keyCallbackMap) as KeyboardKeys.Key[];
   keysToListenFor.forEach(key => keyState.set(key, false));
 
   document.addEventListener("keydown", (e: any) => {
@@ -105,13 +85,13 @@ export function initKeyListeners(keyCallbackMap: KeyListenerCallbackMap) {
       const untriggered = !keyState.get(e.key);
       if (untriggered) {
         keyState.set(e.key, true);
-        keyCallbackMap[e.key as Key]();
+        keyCallbackMap[e.key as KeyboardKeys.Key]();
       }
     }
   });
   document.addEventListener("keyup", e => {
     if (passesKeyUpValidation(e)) {
-      keyState.set(e.key as Key, false);
+      keyState.set(e.key as KeyboardKeys.Key, false);
     }
   });
 }

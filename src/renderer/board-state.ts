@@ -1,5 +1,6 @@
-import * as Button from "./button";
-import * as KeyboardKeys from "./keyboard-keys";
+import { Button } from "../shared/types";
+import { KeyboardKeys } from "../shared/types";
+import { ButtonEditableFields } from "./forms/edit-button-form";
 
 export const moveButton = (
   buttons: Button.Button[],
@@ -36,6 +37,29 @@ export const moveButton = (
       sourceButton.tabID = destinationTabID;
     }
   }
+
+  return buttonsClone;
+};
+
+export const modifyButtonBasics = (
+  buttons: Button.Button[],
+  button: Button.Button,
+  updates: ButtonEditableFields
+): Button.Button[] => {
+  const buttonsClone = buttons.slice();
+  const buttonIndexBeingEdited = buttonsClone.findIndex(
+    b => b.id === button.id
+  );
+  if (buttonIndexBeingEdited < -1) {
+    console.error(
+      "Could not update button basics because it apparently does not exist."
+    );
+  }
+
+  buttonsClone[buttonIndexBeingEdited] = {
+    ...buttons[buttonIndexBeingEdited],
+    ...updates
+  };
 
   return buttonsClone;
 };

@@ -1,3 +1,61 @@
+export namespace KeyboardKeys {
+  export type Key =
+    | "1"
+    | "2"
+    | "3"
+    | "4"
+    | "5"
+    | "q"
+    | "w"
+    | "e"
+    | "r"
+    | "t"
+    | "a"
+    | "s"
+    | "d"
+    | "f"
+    | "g"
+    | "z"
+    | "x"
+    | "c"
+    | "v"
+    | "b";
+}
+
+export namespace Button {
+  export enum Type {
+    Tab = "TAB",
+    Action = "ACTION"
+  }
+
+  interface Base {
+    id: string;
+    type: Type;
+    name: string;
+    icon: string | null;
+    keyboardKey: KeyboardKeys.Key;
+  }
+
+  export interface Action extends Base {
+    type: Type.Action;
+    executionData: Execution.Data;
+    tabID: string;
+  }
+
+  export interface Tab extends Base {
+    type: Type.Tab;
+    id: string;
+  }
+
+  export type Button = Action | Tab;
+
+  export const isAction = (button: Button): button is Action =>
+    button.type === Type.Action;
+
+  export const isTab = (button: Button): button is Tab =>
+    button.type === Type.Tab;
+}
+
 export namespace Execution {
   export enum Type {
     AppleScript = "APPLESCRIPT",

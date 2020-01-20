@@ -4,6 +4,7 @@ import isDev from "electron-is-dev";
 const { resolve } = require("app-root-path");
 
 import * as Toggle from "./toggle";
+import * as LocalPersistence from "./local-persistence";
 import Menu from "./menu";
 
 app.on("ready", async () => {
@@ -15,6 +16,8 @@ app.on("ready", async () => {
       nodeIntegration: true
     }
   });
+
+  LocalPersistence.setup();
 
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
