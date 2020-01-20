@@ -30,7 +30,7 @@ const getActiveWindow = (): Promise<ActiveWindow | null> =>
 export const setup = (win: BrowserWindow) => {
   nigelWindow = win;
 
-  globalShortcut.register("~", async () => {
+  globalShortcut.register("F13", async () => {
     if (win.isFocused()) {
       awayFromNigel();
     } else {
