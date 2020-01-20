@@ -32,20 +32,27 @@ export const setup = (win: BrowserWindow) => {
 
   globalShortcut.register("F13", async () => {
     if (win.isFocused()) {
-      awayFromNigel();
+      await awayFromNigel();
     } else {
-      lastActiveWindow = await getActiveWindow();
-      toNigel();
+      await toNigel();
     }
   });
 };
 
-export const toNigel = () =>
-  nigelWindow
-    ? nigelWindow.focus()
-    : console.error(
-        "Can't focus Nigel because it hasn't been initialized yet."
-      );
+export const resetLastActiveWindow = () => (lastActiveWindow = null);
+
+export const toNigel = async (): Promise<any> => {
+  if (nigelWindow) {
+    if (!lastActiveWindow) {
+      lastActiveWindow = await getActiveWindow();
+    }
+    nigelWindow.focus();
+  } else {
+    return Promise.reject(
+      "Can't focus Nigel because it hasn't been initialized yet."
+    );
+  }
+};
 
 export const awayFromNigel = (): Promise<any> => {
   if (lastActiveWindow) {

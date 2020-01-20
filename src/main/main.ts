@@ -1,9 +1,10 @@
 import { format } from "url";
-import { BrowserWindow, app } from "electron";
+import { BrowserWindow, app, Menu as ElectronMenu } from "electron";
 import isDev from "electron-is-dev";
 const { resolve } = require("app-root-path");
 
 import * as Toggle from "./toggle";
+import Menu from "./menu";
 
 app.on("ready", async () => {
   const mainWindow = new BrowserWindow({
@@ -32,7 +33,7 @@ app.on("ready", async () => {
   });
   const url = isDev ? devPath : prodPath;
 
-  mainWindow.setMenu(null);
+  ElectronMenu.setApplicationMenu(Menu);
   mainWindow.loadURL(url);
 });
 
