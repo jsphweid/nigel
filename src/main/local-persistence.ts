@@ -14,8 +14,9 @@ export const getPersistedButtons = (): Button.Button[] =>
 
 export const setup = () => {
   ButtonsGetter.createHandler(() => Promise.resolve(getPersistedButtons()));
+
   ButtonUpdater.createHandler(update => {
-    const buttons = getPersistedButtons().slice();
+    const buttons = getPersistedButtons();
     const indexOfButton = buttons.findIndex(button => button.id === update.id);
     if (indexOfButton < 0) {
       return Promise.reject(
@@ -26,16 +27,17 @@ export const setup = () => {
     saveNewButtons(buttons);
     return Promise.resolve(buttons);
   });
+
   ButtonMover.createHandler(({ button, destinationKey, destinationTabID }) => {
-    const buttonsClone = getPersistedButtons().slice();
-    const sourceIndex = buttonsClone.findIndex(b => b.id === button.id);
-    const destinationActionIndex = buttonsClone.findIndex(
+    const buttons = getPersistedButtons();
+    const sourceIndex = buttons.findIndex(b => b.id === button.id);
+    const destinationActionIndex = buttons.findIndex(
       b =>
         Button.isAction(b) &&
         b.keyboardKey === destinationKey &&
         b.tabID === destinationTabID
     );
-    const destinationTabIndex = buttonsClone.findIndex(b => {
+    const destinationTabIndex = buttons.findIndex(b => {
       return Button.isTab(b) && b.keyboardKey === destinationKey;
     });
     const destinationIndex = Math.max(
@@ -44,18 +46,19 @@ export const setup = () => {
     );
     if (sourceIndex > -1) {
       if (destinationIndex > -1) {
-        const destinationButton = buttonsClone[destinationIndex];
+        const destinationButton = buttons[destinationIndex];
         destinationButton.keyboardKey = button.keyboardKey;
         if (Button.isAction(destinationButton) && Button.isAction(button)) {
           destinationButton.tabID = button.tabID;
         }
       }
-      const sourceButton = buttonsClone[sourceIndex];
+      const sourceButton = buttons[sourceIndex];
       sourceButton.keyboardKey = destinationKey;
       if (Button.isAction(sourceButton)) {
         sourceButton.tabID = destinationTabID;
       }
     }
-    return Promise.resolve(buttonsClone);
+    saveNewButtons(buttons);
+    return Promise.resolve(buttons);
   });
 };
