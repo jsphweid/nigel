@@ -27,8 +27,17 @@ const App = () => {
     setButtonBeingEdited
   ] = React.useState<Button.Button | null>(null);
 
+  const defaultNewButtonsHandler = (error: Error, buttons: Button.Button[]) =>
+    void console.log("new buttons", buttons) || error
+      ? null
+      : setButtons(buttons);
+
   React.useEffect(() => {
-    ButtonsGetter.call().then(setButtons);
+    ButtonsGetter.call();
+
+    ButtonsGetter.onResponse(defaultNewButtonsHandler);
+    ButtonUpdater.onResponse(defaultNewButtonsHandler);
+    ButtonMover.onResponse(defaultNewButtonsHandler);
   }, []);
 
   return (
@@ -38,9 +47,8 @@ const App = () => {
         data={buttonBeingEdited}
         onSave={data => {
           if (buttonBeingEdited) {
-            ButtonUpdater.call({ ...data, id: buttonBeingEdited.id })
-              .then(setButtons)
-              .then(() => setButtonBeingEdited(null));
+            ButtonUpdater.call({ ...data, id: buttonBeingEdited.id });
+            setButtonBeingEdited(null);
           }
         }}
         onCancel={() => setButtonBeingEdited(null)}
@@ -49,9 +57,7 @@ const App = () => {
       <Board
         buttons={buttons}
         handleButtonMoved={(button, destinationKey, destinationTabID) =>
-          ButtonMover.call({ button, destinationKey, destinationTabID }).then(
-            setButtons
-          )
+          ButtonMover.call({ button, destinationKey, destinationTabID })
         }
         handleActionButtonClicked={button =>
           RendererExecutor.execute(button.executionData)

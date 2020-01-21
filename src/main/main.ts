@@ -17,8 +17,6 @@ app.on("ready", async () => {
     }
   });
 
-  LocalPersistence.setup();
-
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
     if (isDev) {
@@ -26,6 +24,7 @@ app.on("ready", async () => {
     }
   });
 
+  LocalPersistence.setup();
   await Toggle.setup(mainWindow);
 
   const devPath = "http://localhost:1124";

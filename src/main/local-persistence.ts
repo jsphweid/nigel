@@ -13,8 +13,8 @@ export const getPersistedButtons = (): Button.Button[] =>
   store.get(buttonsStorageKey);
 
 export const setup = () => {
-  ButtonsGetter.handle(() => Promise.resolve(getPersistedButtons()));
-  ButtonUpdater.handle(update => {
+  ButtonsGetter.createHandler(() => Promise.resolve(getPersistedButtons()));
+  ButtonUpdater.createHandler(update => {
     const buttons = getPersistedButtons().slice();
     const indexOfButton = buttons.findIndex(button => button.id === update.id);
     if (indexOfButton < 0) {
@@ -26,7 +26,7 @@ export const setup = () => {
     saveNewButtons(buttons);
     return Promise.resolve(buttons);
   });
-  ButtonMover.handle(({ button, destinationKey, destinationTabID }) => {
+  ButtonMover.createHandler(({ button, destinationKey, destinationTabID }) => {
     const buttonsClone = getPersistedButtons().slice();
     const sourceIndex = buttonsClone.findIndex(b => b.id === button.id);
     const destinationActionIndex = buttonsClone.findIndex(
