@@ -6,6 +6,8 @@ declare global {
   }
 }
 
-const RendererElectron: Electron.AllElectron = window.require("electron");
+// because the backend imports this code for now...
+const RendererElectron: Electron.AllElectron =
+  typeof window === "undefined" ? null : window.require("electron");
 
 export default RendererElectron;

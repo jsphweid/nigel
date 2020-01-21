@@ -4,8 +4,8 @@ import Electron from "./renderer-electron";
 
 import Board from "./board";
 import { Button } from "../shared/types";
+import { ButtonUpdater, ButtonMover, ButtonsGetter } from "../shared/services";
 import * as RendererExecutor from "./renderer-executor";
-import * as BoardState from "./board-state";
 import EditButtonForm from "./forms/edit-button-form";
 
 const Container = styled.div``;
@@ -27,19 +27,9 @@ const App = () => {
     setButtonBeingEdited
   ] = React.useState<Button.Button | null>(null);
 
-  const updateButtons = (updatedButtons: Button.Button[]): void => {
-    Electron.ipcRenderer.send("saveButtons", updatedButtons);
-    setButtons(updatedButtons);
-    setButtonBeingEdited(null);
-  };
-
-  Electron.ipcRenderer.on(
-    "getButtons-result",
-    (_: any, __: any, data: Button.Button[]) => {
-      console.log("got button data", data);
-      setButtons(data);
-    }
-  );
+  React.useEffect(() => {
+    ButtonsGetter.call().then(setButtons);
+  }, []);
 
   return (
     <div>
@@ -48,9 +38,9 @@ const App = () => {
         data={buttonBeingEdited}
         onSave={data => {
           if (buttonBeingEdited) {
-            updateButtons(
-              BoardState.modifyButtonBasics(buttons, buttonBeingEdited, data)
-            );
+            ButtonUpdater.call({ ...data, id: buttonBeingEdited.id })
+              .then(setButtons)
+              .then(() => setButtonBeingEdited(null));
           }
         }}
         onCancel={() => setButtonBeingEdited(null)}
@@ -59,13 +49,8 @@ const App = () => {
       <Board
         buttons={buttons}
         handleButtonMoved={(button, destinationKey, destinationTabID) =>
-          updateButtons(
-            BoardState.moveButton(
-              buttons,
-              button,
-              destinationKey,
-              destinationTabID
-            )
+          ButtonMover.call({ button, destinationKey, destinationTabID }).then(
+            setButtons
           )
         }
         handleActionButtonClicked={button =>

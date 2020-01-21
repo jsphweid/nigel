@@ -4,8 +4,9 @@ import { Paper, Grid, Button as MaterialUIButton } from "@material-ui/core";
 import Modal from "react-modal";
 
 import TextField from "./text-field";
+import { Button } from "../../shared/types";
 
-const validate = ({ name }: ButtonEditableFields) => {
+const validate = ({ name }: Button.EditableFields) => {
   const errors: any = {};
   if (!name) {
     errors.title = "Required";
@@ -13,13 +14,8 @@ const validate = ({ name }: ButtonEditableFields) => {
   return errors;
 };
 
-export interface ButtonEditableFields {
-  name: string;
-  icon?: string | null;
-}
-
 interface EditActionButtonFormProps<
-  T extends ButtonEditableFields = ButtonEditableFields
+  T extends Button.EditableFields = Button.EditableFields
 > {
   onSave: (data: T) => void;
   onCancel: () => void;

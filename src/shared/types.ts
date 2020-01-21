@@ -28,6 +28,11 @@ export namespace Button {
     Action = "ACTION"
   }
 
+  export interface EditableFields {
+    name: string;
+    icon: string | null;
+  }
+
   interface Base {
     id: string;
     type: Type;
@@ -54,6 +59,13 @@ export namespace Button {
 
   export const isTab = (button: Button): button is Tab =>
     button.type === Type.Tab;
+}
+
+export namespace Board {
+  export interface Board {
+    defaultTab: string | null;
+    buttons: Button.Button[];
+  }
 }
 
 export namespace Execution {

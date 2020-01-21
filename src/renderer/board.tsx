@@ -6,7 +6,7 @@ import { Option, Fn, pipe } from "@grapheng/prelude";
 import { Button } from "../shared/types";
 import { KeyboardKeys as KeyboardKeysTypes } from "../shared/types";
 import * as KeyboardKeys from "./keyboard-keys";
-import * as Utils from "./utils";
+import * as Utilities from "../shared/utilities";
 import TileBackdrop from "./components/tile-backdrop";
 import DraggableButton from "./draggable-button";
 import { Coordinate } from "./types";
@@ -45,7 +45,7 @@ class Board extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const activeTabID = props.buttons.find(b => Button.isTab(b))?.id || "";
+    const activeTabID = "tab1"; // props.buttons.find(b => Button.isTab(b))?.id || "";
 
     this.state = {
       buttonThatsBeingDragged: null,
@@ -87,7 +87,9 @@ class Board extends React.Component<Props, State> {
       const possiblyNewButtonVersion = this.props.buttons.find(
         b => b.id === id
       );
-      if (!Utils.isEqual(possiblyNewButtonVersion, buttonThatsBeingHovered)) {
+      if (
+        !Utilities.isEqual(possiblyNewButtonVersion, buttonThatsBeingHovered)
+      ) {
         this.setState({
           buttonThatsBeingHovered: possiblyNewButtonVersion || null
         });
@@ -95,8 +97,8 @@ class Board extends React.Component<Props, State> {
     }
 
     if (
-      !Utils.isEqual(previousProps.buttons, this.props.buttons) ||
-      !Utils.isEqual(previousState.activeTabID, this.state.activeTabID)
+      !Utilities.isEqual(previousProps.buttons, this.props.buttons) ||
+      !Utilities.isEqual(previousState.activeTabID, this.state.activeTabID)
     ) {
       this.setState({
         buttonsView: this.makeComputedButtonsView(
