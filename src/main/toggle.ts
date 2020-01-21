@@ -31,6 +31,7 @@ export const setup = (win: BrowserWindow) => {
   nigelWindow = win;
 
   globalShortcut.register("F13", async () => {
+    console.log("Toggle hotkey pressed.");
     if (win.isFocused()) {
       await awayFromNigel();
     } else {
