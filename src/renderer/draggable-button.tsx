@@ -52,7 +52,9 @@ interface DraggableButtonProps {
     y: number;
   };
   onMouseEnter: () => void;
+  onMouseLeave: () => void;
   onDragStop: (coordinate: Coordinate) => void;
+  onDragStart: () => void;
   onClick: () => void;
   onEditButtonClick: () => void;
   onDeleteButtonClick: () => void;
@@ -69,7 +71,15 @@ const defaultDisplayProps = {
 // TODO: maybe we never need default?
 const DraggableButton: React.SFC<DraggableButtonProps> = props => {
   const { height, width, x, y } = props.display || defaultDisplayProps;
-  const { button, onDragStop, onMouseEnter, onClick, active } = props;
+  const {
+    button,
+    onDragStop,
+    onMouseEnter,
+    onMouseLeave,
+    onClick,
+    active,
+    onDragStart
+  } = props;
 
   const BigButtonComponent = active ? (
     <PressedBigButton>{button.name}</PressedBigButton>
@@ -84,9 +94,11 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
       handle=".handle"
       position={{ x: 0, y: 0 }}
       onStop={(e: any) => onDragStop({ x: e.pageX, y: e.pageY })}
+      onStart={onDragStart}
     >
       <Container
         onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         style={{
           height: `${height}px`,
           width: `${width}px`,

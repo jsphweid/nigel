@@ -35,7 +35,7 @@ interface State {
   itemHeight: number;
   itemWidth: number;
   activeTabID: string;
-  buttonThatsBeingDragged: Button.Button | null;
+  buttonThatsBeingHoveredIsBeingDragged: boolean;
   buttonThatsBeingHovered: Button.Button | null;
 }
 
@@ -48,7 +48,7 @@ class Board extends React.Component<Props, State> {
     const activeTabID = "tab1"; // props.buttons.find(b => Button.isTab(b))?.id || "";
 
     this.state = {
-      buttonThatsBeingDragged: null,
+      buttonThatsBeingHoveredIsBeingDragged: false,
       buttonThatsBeingHovered: null,
       boardHeight: 0,
       boardWidth: 0,
@@ -59,6 +59,10 @@ class Board extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
+    this.initializeHotkeys();
+  }
+
+  private initializeHotkeys = () =>
     KeyboardKeys.initKeyListeners(
       KeyboardKeys.all.reduce(
         (previous, key) => ({
@@ -68,6 +72,9 @@ class Board extends React.Component<Props, State> {
               Option.fromNullable(
                 this.makeComputedButtonsView(
                   this.props.buttons,
+                  this.state.buttonThatsBeingHoveredIsBeingDragged
+                    ? this.state.buttonThatsBeingHovered
+                    : null,
                   this.state.activeTabID
                 ).byKeyboardKey.get(key)
               ),
@@ -79,12 +86,18 @@ class Board extends React.Component<Props, State> {
         {} as KeyboardKeys.KeyListenerCallbackMap
       )
     );
+
+  public componentDidUpdate() {
+    this.weirdStuff();
   }
 
-  public componentDidUpdate(previousProps: Props, previousState: State) {
-    const { buttonThatsBeingHovered, buttonThatsBeingDragged } = this.state;
+  public weirdStuff = () => {
+    const {
+      buttonThatsBeingHovered,
+      buttonThatsBeingHoveredIsBeingDragged
+    } = this.state;
     if (buttonThatsBeingHovered) {
-      if (buttonThatsBeingDragged) {
+      if (buttonThatsBeingHoveredIsBeingDragged) {
         return;
       }
       const possiblyNewButtonVersion = this.props.buttons.find(
@@ -98,16 +111,21 @@ class Board extends React.Component<Props, State> {
         });
       }
     }
-  }
+  };
 
   private makeComputedButtonsView = memoizeOne(
-    (buttons: Button.Button[], activeTabID: string): ButtonsView =>
+    (
+      buttons: Button.Button[],
+      buttonBeingHovered: Button.Button | null,
+      activeTabID: string
+    ): ButtonsView =>
       pipe(
         buttons,
         buttons =>
           buttons.filter(
             button =>
-              button.type === Button.Type.Tab || button.tabID === activeTabID
+              button !== buttonBeingHovered &&
+              (Button.isTab(button) || button.tabID === activeTabID)
           ),
         filteredButtons => ({
           all: filteredButtons,
@@ -133,8 +151,8 @@ class Board extends React.Component<Props, State> {
   };
 
   private handleButtonDragStop = (coordinate: Coordinate) => {
-    const { buttonThatsBeingHovered } = this.state;
-    const { boardHeight, boardWidth } = this.state;
+    const { buttonThatsBeingHovered, boardHeight, boardWidth } = this.state;
+
     const keyboardKeyDestination = KeyboardKeys.determineKeyboardKeyDestination(
       boardWidth,
       boardHeight,
@@ -148,12 +166,22 @@ class Board extends React.Component<Props, State> {
         this.state.activeTabID
       );
     }
-    this.setState({ buttonThatsBeingDragged: null });
+    this.setState({ buttonThatsBeingHoveredIsBeingDragged: false });
   };
 
   private handleButtonActivated = (button: Button.Button) => {
+    const {
+      buttonThatsBeingHoveredIsBeingDragged,
+      buttonThatsBeingHovered
+    } = this.state;
+
     if (Button.isTab(button)) {
-      this.setState({ activeTabID: button.id });
+      this.setState({
+        activeTabID: button.id,
+        buttonThatsBeingHovered: buttonThatsBeingHoveredIsBeingDragged
+          ? buttonThatsBeingHovered
+          : null
+      });
     } else {
       this.props.handleActionButtonClicked(button);
     }
@@ -172,8 +200,12 @@ class Board extends React.Component<Props, State> {
         button={button}
         display={{ x, y, height: itemHeight, width: itemWidth }}
         active={button.id === this.state.activeTabID}
+        onDragStart={() =>
+          this.setState({ buttonThatsBeingHoveredIsBeingDragged: true })
+        }
         onDragStop={this.handleButtonDragStop}
         onMouseEnter={() => this.setState({ buttonThatsBeingHovered: button })}
+        onMouseLeave={() => this.setState({ buttonThatsBeingHovered: null })}
         onClick={() => this.handleButtonActivated(button)}
         onEditButtonClick={() => this.props.handleEditButtonClicked(button)}
         onDeleteButtonClick={() => this.props.handleDeleteButtonClicked(button)}
@@ -181,9 +213,16 @@ class Board extends React.Component<Props, State> {
     );
   };
 
+  private renderButtonBeingHovered = () =>
+    pipe(
+      Option.fromNullable(this.state.buttonThatsBeingHovered),
+      Option.fold(Fn.constNull, this.renderButton)
+    );
+
   public render() {
-    const buttonsToDisplay = this.makeComputedButtonsView(
+    const staticButtonsToDisplay = this.makeComputedButtonsView(
       this.props.buttons,
+      this.state.buttonThatsBeingHovered,
       this.state.activeTabID
     ).all;
 
@@ -203,7 +242,8 @@ class Board extends React.Component<Props, State> {
           keyWidth={this.state.itemWidth}
           keyHeight={this.state.itemHeight}
         />
-        {buttonsToDisplay.map(this.renderButton)}
+        {staticButtonsToDisplay.map(this.renderButton)}
+        {this.renderButtonBeingHovered()}
       </ResizeAware>
     );
   }
