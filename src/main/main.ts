@@ -9,7 +9,7 @@ import Menu from "./menu";
 
 app.on("ready", async () => {
   const mainWindow = new BrowserWindow({
-    width: 800,
+    width: isDev ? 1200 : 800, // give room for dev tools to be open
     height: 600,
     show: false,
     webPreferences: {

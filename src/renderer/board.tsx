@@ -56,7 +56,9 @@ class Board extends React.Component<Props, State> {
       itemWidth: 0,
       activeTabID
     };
+  }
 
+  public componentDidMount() {
     KeyboardKeys.initKeyListeners(
       KeyboardKeys.all.reduce(
         (previous, key) => ({
@@ -65,8 +67,8 @@ class Board extends React.Component<Props, State> {
             pipe(
               Option.fromNullable(
                 this.makeComputedButtonsView(
-                  props.buttons,
-                  activeTabID
+                  this.props.buttons,
+                  this.state.activeTabID
                 ).byKeyboardKey.get(key)
               ),
               Option.fold(Fn.constVoid, button =>
