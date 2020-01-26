@@ -2,6 +2,7 @@ import * as React from "react";
 const resizeAware = require("react-resize-aware");
 const ResizeAware = resizeAware.default || resizeAware;
 import { Option, Fn, pipe } from "@grapheng/prelude";
+import memoizeOne from "memoize-one";
 
 import { Button } from "../shared/types";
 import { KeyboardKeys as KeyboardKeysTypes } from "../shared/types";
@@ -36,7 +37,6 @@ interface State {
   activeTabID: string;
   buttonThatsBeingDragged: Button.Button | null;
   buttonThatsBeingHovered: Button.Button | null;
-  buttonsView: ButtonsView;
 }
 
 class Board extends React.Component<Props, State> {
@@ -54,8 +54,7 @@ class Board extends React.Component<Props, State> {
       boardWidth: 0,
       itemHeight: 0,
       itemWidth: 0,
-      activeTabID,
-      buttonsView: this.makeComputedButtonsView(props.buttons, activeTabID)
+      activeTabID
     };
 
     KeyboardKeys.initKeyListeners(
@@ -65,7 +64,10 @@ class Board extends React.Component<Props, State> {
           [key]: () =>
             pipe(
               Option.fromNullable(
-                this.state.buttonsView.byKeyboardKey.get(key)
+                this.makeComputedButtonsView(
+                  props.buttons,
+                  activeTabID
+                ).byKeyboardKey.get(key)
               ),
               Option.fold(Fn.constVoid, button =>
                 this.handleButtonActivated(button)
@@ -83,9 +85,8 @@ class Board extends React.Component<Props, State> {
       if (buttonThatsBeingDragged) {
         return;
       }
-      const { id } = buttonThatsBeingHovered;
       const possiblyNewButtonVersion = this.props.buttons.find(
-        b => b.id === id
+        b => b.id === buttonThatsBeingHovered.id
       );
       if (
         !Utilities.isEqual(possiblyNewButtonVersion, buttonThatsBeingHovered)
@@ -95,38 +96,28 @@ class Board extends React.Component<Props, State> {
         });
       }
     }
-
-    if (
-      !Utilities.isEqual(previousProps.buttons, this.props.buttons) ||
-      !Utilities.isEqual(previousState.activeTabID, this.state.activeTabID)
-    ) {
-      this.setState({
-        buttonsView: this.makeComputedButtonsView(
-          this.props.buttons,
-          this.state.activeTabID
-        )
-      });
-    }
   }
 
-  private makeComputedButtonsView = (
-    buttons: Button.Button[],
-    activeTabID: string
-  ): ButtonsView =>
-    pipe(
-      buttons,
-      buttons =>
-        buttons.filter(
-          button =>
-            button.type === Button.Type.Tab || button.tabID === activeTabID
-        ),
-      filteredButtons => ({
-        all: filteredButtons,
-        byKeyboardKey: new Map(
-          filteredButtons.map(button => [button.keyboardKey, button])
-        )
-      })
-    );
+  private makeComputedButtonsView = memoizeOne(
+    (buttons: Button.Button[], activeTabID: string): ButtonsView =>
+      pipe(
+        buttons,
+        buttons =>
+          buttons.filter(
+            button =>
+              button.type === Button.Type.Tab || button.tabID === activeTabID
+          ),
+        filteredButtons => ({
+          all: filteredButtons,
+          byKeyboardKey: new Map(
+            filteredButtons.map(button => [button.keyboardKey, button])
+          )
+        })
+      ),
+    // TODO: someday fix this... but, for whatever reason,
+    // the previous and next are the same, even when there is somehow a change...
+    (_newArgs, _lastArgs) => false
+  );
 
   private handleResize = (size: { width: number; height: number }) => {
     if (!size.width) return;
@@ -189,7 +180,10 @@ class Board extends React.Component<Props, State> {
   };
 
   public render() {
-    const buttonsToDisplay = this.state.buttonsView.all;
+    const buttonsToDisplay = this.makeComputedButtonsView(
+      this.props.buttons,
+      this.state.activeTabID
+    ).all;
 
     return (
       <ResizeAware
