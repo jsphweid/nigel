@@ -10,6 +10,7 @@ Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate te
 
 #### TODO:
 
+- abstract optimistic rendering and saving
 - introduce concept of boards
 - default tab
 - how do I make this secure?

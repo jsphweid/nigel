@@ -33,6 +33,16 @@ export namespace Button {
     icon: string | null;
   }
 
+  export interface EditableFieldsUpdate extends EditableFields {
+    id: string;
+  }
+
+  export interface MoveUpdate {
+    button: Button;
+    destinationKey: KeyboardKeys.Key;
+    destinationTabID: string;
+  }
+
   interface Base {
     id: string;
     type: Type;
@@ -65,6 +75,7 @@ export namespace Board {
   export interface Board {
     defaultTab: string | null;
     buttons: Button.Button[];
+    id: string;
   }
 }
 

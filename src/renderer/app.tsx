@@ -1,11 +1,13 @@
 import * as React from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import Electron from "./renderer-electron";
+import { Either, Fn } from "@grapheng/prelude";
 
+import Electron from "./renderer-electron";
 import Board from "./board";
 import { Button } from "../shared/types";
-import { ButtonUpdater, ButtonMover, ButtonsGetter } from "../shared/services";
 import * as RendererExecutor from "./renderer-executor";
+import { UpdateButtonsOnBoard, BoardGetter } from "../shared/services";
+import * as Logic from "./logic";
 import EditButtonForm from "./forms/edit-button-form";
 
 const Container = styled.div``;
@@ -21,24 +23,33 @@ export const GlobalStyles = createGlobalStyle`
 Electron.ipcRenderer.send("getButtons");
 
 const App = () => {
+  const [boardID] = React.useState<string>("board1");
   const [buttons, setButtons] = React.useState<Button.Button[]>([]);
   const [
     buttonBeingEdited,
     setButtonBeingEdited
   ] = React.useState<Button.Button | null>(null);
 
-  const defaultNewButtonsHandler = (error: Error, buttons: Button.Button[]) =>
-    void console.log("new buttons", buttons) || error
-      ? null
-      : setButtons(buttons);
-
   React.useEffect(() => {
-    ButtonsGetter.call();
+    BoardGetter.call(boardID);
+    BoardGetter.onResponse(
+      Either.fold(console.error, board => setButtons(board.buttons))
+    );
 
-    ButtonsGetter.onResponse(defaultNewButtonsHandler);
-    ButtonUpdater.onResponse(defaultNewButtonsHandler);
-    ButtonMover.onResponse(defaultNewButtonsHandler);
+    // TODO: display some sort of toast on error
+    UpdateButtonsOnBoard.onResponse(Either.fold(console.error, Fn.constVoid));
   }, []);
+
+  const updateButtons = (newButtons: Button.Button[]) => {
+    // optimistically update buttons UI
+    setButtons(newButtons);
+
+    // persist changes
+    UpdateButtonsOnBoard.call({
+      boardID,
+      newButtons
+    });
+  };
 
   return (
     <div>
@@ -47,7 +58,12 @@ const App = () => {
         data={buttonBeingEdited}
         onSave={data => {
           if (buttonBeingEdited) {
-            ButtonUpdater.call({ ...data, id: buttonBeingEdited.id });
+            updateButtons(
+              Logic.updateButton(buttons, {
+                ...data,
+                id: buttonBeingEdited.id
+              })
+            );
             setButtonBeingEdited(null);
           }
         }}
@@ -57,7 +73,13 @@ const App = () => {
       <Board
         buttons={buttons}
         handleButtonMoved={(button, destinationKey, destinationTabID) =>
-          ButtonMover.call({ button, destinationKey, destinationTabID })
+          updateButtons(
+            Logic.moveButton(buttons, {
+              button,
+              destinationKey,
+              destinationTabID
+            })
+          )
         }
         handleActionButtonClicked={button =>
           RendererExecutor.execute(button.executionData)
