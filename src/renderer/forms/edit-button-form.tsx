@@ -29,6 +29,7 @@ const EditButtonNameForm: React.SFC<EditActionButtonFormProps> = ({
 }: EditActionButtonFormProps) =>
   data ? (
     <Modal
+      ariaHideApp={false}
       isOpen={!!data}
       onRequestClose={onCancel}
       contentLabel="Edit Basic Button Properties"
