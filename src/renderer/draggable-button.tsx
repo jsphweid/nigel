@@ -1,6 +1,7 @@
 import * as React from "react";
 import Draggable from "react-draggable";
 import styled from "styled-components";
+const { Textfit } = require("react-textfit");
 
 import { Button } from "../shared/types";
 import * as Icons from "./icons";
@@ -31,7 +32,6 @@ const BigButton = styled.button`
   height: 100%;
   margin: 8px;
   text-align: center;
-  font-size: 4vh;
   background: rgb(106, 106, 238);
   border-radius: 8px;
   outline: none;
@@ -81,10 +81,23 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
     onDragStart
   } = props;
 
+  const buttonTextContainer = (
+    <Textfit
+      style={{
+        height: `100%`,
+        width: `100%`
+      }}
+      mode="multi"
+      max={60}
+    >
+      {button.name}
+    </Textfit>
+  );
+
   const BigButtonComponent = active ? (
-    <PressedBigButton>{button.name}</PressedBigButton>
+    <PressedBigButton>{buttonTextContainer}</PressedBigButton>
   ) : (
-    <BigButton onClick={onClick}>{button.name}</BigButton>
+    <BigButton onClick={onClick}>{buttonTextContainer}</BigButton>
   );
 
   return (
