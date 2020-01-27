@@ -5,8 +5,7 @@ Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate te
 #### BUGS:
 
 - no selection on buttons
-- can't copy paste text in
-- moving tab to button doesn't work
+- can't copy paste text in edit window
 
 #### TODO:
 
