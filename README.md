@@ -4,8 +4,8 @@ Used https://github.com/shamofu/electron-react-parcel-boilerplate to generate te
 
 #### BUGS:
 
-- fix drag while changing tabs
 - no selection on buttons
+- can't copy paste text in
 - moving tab to button doesn't work
 
 #### TODO:

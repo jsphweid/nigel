@@ -81,15 +81,10 @@ const DraggableButton: React.SFC<DraggableButtonProps> = props => {
     onDragStart
   } = props;
 
-  const buttonTextContainer = (
-    <Textfit
-      style={{
-        height: `100%`,
-        width: `100%`
-      }}
-      mode="multi"
-      max={60}
-    >
+  const buttonTextContainer = button.icon ? (
+    <img src={button.icon} />
+  ) : (
+    <Textfit style={{ height: "100%", width: "100%" }} mode="multi" max={60}>
       {button.name}
     </Textfit>
   );
