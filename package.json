@@ -14,7 +14,9 @@
     "renderer:watch": "parcel src/renderer/index.html --port 1124 --out-dir src/renderer/.parcel/development",
     "parcel:build": "run-s main:build renderer:build",
     "main:build": "parcel build src/main/main.ts --out-dir src/main/.parcel --out-file main --target electron",
-    "renderer:build": "parcel build src/renderer/index.html --public-url ./ --out-dir src/renderer/.parcel/production"
+    "renderer:build": "parcel build src/renderer/index.html --public-url ./ --out-dir src/renderer/.parcel/production",
+    "test": "jest",
+    "test:dev": "jest --watch"
   },
   "repository": "https://github.com/jsphweid/nigel",
   "author": "Joseph Weidinger",
@@ -55,6 +57,7 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^25.1.1",
     "@types/lodash.isequal": "^4.5.5",
     "@types/memoize-one": "^5.1.2",
     "@types/react": "^16.8.22",
@@ -67,6 +70,7 @@
     "babel-jest": "^24.8.0",
     "electron": "^5.0.13",
     "electron-builder": "^20.44.4",
+    "jest": "^25.1.0",
     "nodemon": "^1.19.1",
     "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.12.3",
@@ -74,6 +78,7 @@
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
     "spectron": "^7.0.0",
+    "ts-jest": "^25.1.0",
     "typescript": "^3.5.2"
   },
   "dependencies": {

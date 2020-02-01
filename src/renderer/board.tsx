@@ -21,7 +21,10 @@ interface Props {
   handleActionButtonClicked: (button: Button.Action) => void;
   handleEditButtonClicked: (button: Button.Button) => void;
   handleDeleteButtonClicked: (button: Button.Button) => void;
-  handleOnDoubleClick: (key: KeyboardKeysTypes.Key, tabID: string) => void;
+  handleOnDoubleClick: (
+    keyboardKey: KeyboardKeysTypes.Key,
+    tabID: string
+  ) => void;
   active: boolean;
 }
 

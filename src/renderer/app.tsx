@@ -4,14 +4,12 @@ import { Either, Fn } from "@grapheng/prelude";
 
 import Electron from "./renderer-electron";
 import Board from "./board";
-import { Button } from "../shared/types";
+import { Button, KeyboardKeys } from "../shared/types";
 import * as RendererExecutor from "./renderer-executor";
 import { UpdateButtonsOnBoard, BoardGetter } from "../shared/services";
 import * as Logic from "./logic";
 import EditButtonForm from "./forms/edit-button-form";
 import AddButtonForm from "./forms/add-button-form";
-
-const Container = styled.div``;
 
 export const GlobalStyles = createGlobalStyle`
   html, body {
@@ -34,7 +32,7 @@ const App = () => {
   const [
     addButtonInitialData,
     setAddButtonInitialData
-  ] = React.useState<Button.NewButtonFields | null>(null);
+  ] = React.useState<Button.NewButtonInitialData | null>(null);
 
   React.useEffect(() => {
     BoardGetter.call(boardID);
@@ -75,11 +73,12 @@ const App = () => {
         }}
         onCancel={() => setButtonBeingEdited(null)}
       />
+
       <AddButtonForm
         data={addButtonInitialData}
         onSave={data => {
-          // TODO: do stuff
-          console.log("saving", data);
+          updateButtons(Logic.newButton(buttons, data));
+          setAddButtonInitialData(null);
         }}
         onCancel={() => setAddButtonInitialData(null)}
       />
@@ -100,16 +99,12 @@ const App = () => {
           RendererExecutor.execute(button.executionData)
         }
         handleEditButtonClicked={setButtonBeingEdited}
-        handleOnDoubleClick={(key, tabID) =>
-          setAddButtonInitialData({
-            name: "",
-            icon: null,
-            code: "",
-            key,
-            tabID
-          })
+        handleOnDoubleClick={(keyboardKey, tabID) =>
+          setAddButtonInitialData({ keyboardKey, tabID })
         }
-        handleDeleteButtonClicked={() => console.log("delete clicked")}
+        handleDeleteButtonClicked={button =>
+          updateButtons(Logic.deleteButton(buttons, button.id))
+        }
       />
     </div>
   );
