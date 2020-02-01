@@ -9,6 +9,7 @@ import * as RendererExecutor from "./renderer-executor";
 import { UpdateButtonsOnBoard, BoardGetter } from "../shared/services";
 import * as Logic from "./logic";
 import EditButtonForm from "./forms/edit-button-form";
+import AddButtonForm from "./forms/add-button-form";
 
 const Container = styled.div``;
 
@@ -29,6 +30,11 @@ const App = () => {
     buttonBeingEdited,
     setButtonBeingEdited
   ] = React.useState<Button.Button | null>(null);
+
+  const [
+    addButtonInitialData,
+    setAddButtonInitialData
+  ] = React.useState<Button.NewButtonFields | null>(null);
 
   React.useEffect(() => {
     BoardGetter.call(boardID);
@@ -69,8 +75,17 @@ const App = () => {
         }}
         onCancel={() => setButtonBeingEdited(null)}
       />
+      <AddButtonForm
+        data={addButtonInitialData}
+        onSave={data => {
+          // TODO: do stuff
+          console.log("saving", data);
+        }}
+        onCancel={() => setAddButtonInitialData(null)}
+      />
 
       <Board
+        active={!buttonBeingEdited && !addButtonInitialData}
         buttons={buttons}
         handleButtonMoved={(button, destinationKey, destinationTabID) =>
           updateButtons(
@@ -85,6 +100,15 @@ const App = () => {
           RendererExecutor.execute(button.executionData)
         }
         handleEditButtonClicked={setButtonBeingEdited}
+        handleOnDoubleClick={(key, tabID) =>
+          setAddButtonInitialData({
+            name: "",
+            icon: null,
+            code: "",
+            key,
+            tabID
+          })
+        }
         handleDeleteButtonClicked={() => console.log("delete clicked")}
       />
     </div>

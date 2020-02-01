@@ -33,6 +33,12 @@ export namespace Button {
     icon: string | null;
   }
 
+  export interface NewButtonFields extends EditableFields {
+    key: KeyboardKeys.Key;
+    tabID: string;
+    code: string;
+  }
+
   export interface EditableFieldsUpdate extends EditableFields {
     id: string;
   }

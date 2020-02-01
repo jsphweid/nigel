@@ -2,10 +2,12 @@ import * as React from "react";
 import styled from "styled-components";
 
 import * as KeyboardKeys from "../keyboard-keys";
+import { KeyboardKeys as Keys } from "../../shared/types";
 
 interface TileBackdropProps {
   keyHeight: number;
   keyWidth: number;
+  onDoubleClick: (key: Keys.Key) => void;
 }
 
 const Container = styled.div`
@@ -25,7 +27,8 @@ const Num = styled.div`
 
 const TileBackdrop: React.SFC<TileBackdropProps> = ({
   keyHeight,
-  keyWidth
+  keyWidth,
+  onDoubleClick
 }) => (
   <div>
     {KeyboardKeys.arrangement
@@ -37,7 +40,7 @@ const TileBackdrop: React.SFC<TileBackdropProps> = ({
               height: keyHeight,
               width: keyWidth
             }}
-            onDoubleClick={() => console.log("double click called")}
+            onDoubleClick={() => onDoubleClick(key)}
           >
             <Num>{key}</Num>
           </Container>

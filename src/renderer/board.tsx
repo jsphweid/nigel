@@ -4,8 +4,7 @@ const ResizeAware = resizeAware.default || resizeAware;
 import { Option, Fn, pipe } from "@grapheng/prelude";
 import memoizeOne from "memoize-one";
 
-import { Button } from "../shared/types";
-import { KeyboardKeys as KeyboardKeysTypes } from "../shared/types";
+import { Button, KeyboardKeys as KeyboardKeysTypes } from "../shared/types";
 import * as KeyboardKeys from "./keyboard-keys";
 import * as Utilities from "../shared/utilities";
 import TileBackdrop from "./components/tile-backdrop";
@@ -22,6 +21,8 @@ interface Props {
   handleActionButtonClicked: (button: Button.Action) => void;
   handleEditButtonClicked: (button: Button.Button) => void;
   handleDeleteButtonClicked: (button: Button.Button) => void;
+  handleOnDoubleClick: (key: KeyboardKeysTypes.Key, tabID: string) => void;
+  active: boolean;
 }
 
 interface ButtonsView {
@@ -41,6 +42,7 @@ interface State {
 
 class Board extends React.Component<Props, State> {
   private els: { board: any } = { board: null };
+  private hotkeys: KeyboardKeys.Hotkeys | null = null;
 
   constructor(props: Props) {
     super(props);
@@ -62,8 +64,29 @@ class Board extends React.Component<Props, State> {
     this.initializeHotkeys();
   }
 
-  private initializeHotkeys = () =>
-    KeyboardKeys.initKeyListeners(
+  public componentWillReceiveProps(newProps: Props) {
+    const { active } = this.props;
+    if (!active && newProps.active) {
+      this.handleBoardUnfreeze();
+    } else if (active && !newProps.active) {
+      this.handleBoardFreeze();
+    }
+  }
+
+  private handleBoardFreeze = () => {
+    if (this.hotkeys) {
+      this.hotkeys.deactivate();
+    }
+  };
+
+  private handleBoardUnfreeze = () => {
+    if (this.hotkeys) {
+      this.hotkeys.activate();
+    }
+  };
+
+  private initializeHotkeys = () => {
+    this.hotkeys = new KeyboardKeys.Hotkeys(
       KeyboardKeys.all.reduce(
         (previous, key) => ({
           ...previous,
@@ -86,6 +109,7 @@ class Board extends React.Component<Props, State> {
         {} as KeyboardKeys.KeyListenerCallbackMap
       )
     );
+  };
 
   public componentDidUpdate() {
     this.weirdStuff();
@@ -241,6 +265,9 @@ class Board extends React.Component<Props, State> {
         <TileBackdrop
           keyWidth={this.state.itemWidth}
           keyHeight={this.state.itemHeight}
+          onDoubleClick={key =>
+            this.props.handleOnDoubleClick(key, this.state.activeTabID)
+          }
         />
         {staticButtonsToDisplay.map(this.renderButton)}
         {this.renderButtonBeingHovered()}

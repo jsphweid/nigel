@@ -52,46 +52,57 @@ export function determineKeyboardKeyDestination(
   return position ? Coordinates.getKeyFromCoords(position) : null;
 }
 
-const keyState = new Map<KeyboardKeys.Key, boolean>();
-
-const passesKeyDownValidation = (e: any): boolean =>
-  // TODO: in the future, have a different system for
-  // dealing with keys like Command / Control / Option / etc.
-  keyState.get(e.key) !== undefined &&
-  e.target &&
-  e.target.tagName !== "INPUT" &&
-  e.target.tagName !== "TEXTAREA" &&
-  !e.metaKey;
-
-const passesKeyUpValidation = (e: any): boolean =>
-  keyState.get(e.key) !== undefined;
-
 export type KeyListenerCallbackMap = { [key in KeyboardKeys.Key]: () => void };
 
-export function initKeyListeners(keyCallbackMap: KeyListenerCallbackMap) {
-  if (typeof window === "undefined") {
-    console.log(
-      "Not initializing keyboard listeners as that requires the window."
-    );
-    return;
-  }
-  const keysToListenFor = Object.keys(keyCallbackMap) as KeyboardKeys.Key[];
-  keysToListenFor.forEach(key => keyState.set(key, false));
+export class Hotkeys {
+  private keyCallbackMap: KeyListenerCallbackMap;
+  private keyState = new Map<KeyboardKeys.Key, boolean>();
 
-  document.addEventListener("keydown", (e: any) => {
-    // ignore if typing in an <input /> for example
-    if (passesKeyDownValidation(e)) {
+  public constructor(keyCallbackMap: KeyListenerCallbackMap) {
+    this.keyCallbackMap = keyCallbackMap;
+  }
+
+  private passesKeyUpValidation = (e: any): boolean =>
+    this.keyState.get(e.key) !== undefined;
+
+  private passesKeyDownValidation = (e: any): boolean =>
+    // TODO: in the future, have a different system for
+    // dealing with keys like Command / Control / Option / etc.
+    this.keyState.get(e.key) !== undefined &&
+    e.target &&
+    e.target.tagName !== "INPUT" &&
+    e.target.tagName !== "TEXTAREA" &&
+    !e.metaKey;
+
+  private keyDownHandler = (e: any) => {
+    if (this.passesKeyDownValidation(e)) {
       e.preventDefault();
-      const untriggered = !keyState.get(e.key);
+      const untriggered = !this.keyState.get(e.key);
       if (untriggered) {
-        keyState.set(e.key, true);
-        keyCallbackMap[e.key as KeyboardKeys.Key]();
+        this.keyState.set(e.key, true);
+        this.keyCallbackMap[e.key as KeyboardKeys.Key]();
       }
     }
-  });
-  document.addEventListener("keyup", e => {
-    if (passesKeyUpValidation(e)) {
-      keyState.set(e.key as KeyboardKeys.Key, false);
+  };
+
+  private keyUpHandler = (e: any) => {
+    if (this.passesKeyUpValidation(e)) {
+      this.keyState.set(e.key as KeyboardKeys.Key, false);
     }
-  });
+  };
+
+  public activate = () => {
+    const keysToListenFor = Object.keys(
+      this.keyCallbackMap
+    ) as KeyboardKeys.Key[];
+    keysToListenFor.forEach(key => this.keyState.set(key, false));
+
+    document.addEventListener("keydown", this.keyDownHandler);
+    document.addEventListener("keyup", this.keyUpHandler);
+  };
+
+  public deactivate = () => {
+    document.removeEventListener("keydown", this.keyDownHandler);
+    document.removeEventListener("keyup", this.keyUpHandler);
+  };
 }
