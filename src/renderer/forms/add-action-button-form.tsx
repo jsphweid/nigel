@@ -10,7 +10,7 @@ import { AddButtonFormProps } from "./add-button-form";
 
 interface NewActionButtonEditableFields {
   name: string;
-  code: string;
+  code: { code: string; type: Execution.Type };
   icon?: string;
 }
 
@@ -25,14 +25,6 @@ const validate = ({ name, code }: Partial<NewActionButtonEditableFields>) => {
   return errors;
 };
 
-const initialCode = `HelperV1()
-  .activate("Finale")
-  .clickMenuItems([
-    "Tools",
-    "Smart Shape",
-    "Decrescendo"
-  ]);`;
-
 interface Props extends AddButtonFormProps<Button.Action> {
   data: Button.NewButtonInitialData;
 }
@@ -40,14 +32,14 @@ interface Props extends AddButtonFormProps<Button.Action> {
 const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
     <Form
-      initialValues={{ name: "", icon: "", code: initialCode }}
+      initialValues={{ name: "", icon: "" }}
       onSubmit={(formData: NewActionButtonEditableFields) =>
         onSave({
           ...data,
           id: Utilities.generateRandomID(),
           executionData: {
-            type: Execution.Type.JXA,
-            script: formData.code
+            type: formData.code.type,
+            script: formData.code.code
           },
           name: formData.name,
           type: Button.Type.Action,
