@@ -25,7 +25,6 @@ interface Props extends AddButtonFormProps<Button.Tab> {
 }
 const AddTabButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
-    Add Tab Button
     <Form
       onSubmit={(formData: NewTabButtonEditableFields) =>
         onSave({
@@ -41,7 +40,7 @@ const AddTabButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
         <form onSubmit={handleSubmit}>
           <Paper style={{ padding: 16 }}>
             <Grid container={true} alignItems="flex-start" spacing={8}>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={4}>
                 <Field
                   fullWidth={true}
                   required={true}
@@ -51,7 +50,7 @@ const AddTabButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
                   label="Button Name"
                 />
               </Grid>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={8}>
                 <Field
                   fullWidth={true}
                   required={false}

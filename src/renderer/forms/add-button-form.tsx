@@ -50,6 +50,7 @@ const AddButtonForm = (props: AddButtonFormProps<Button.Button>) => {
         <RadioGroup
           value={type}
           onChange={thing => setType(thing.currentTarget.value)}
+          row={true}
         >
           <FormControlLabel
             value={Button.Type.Action}

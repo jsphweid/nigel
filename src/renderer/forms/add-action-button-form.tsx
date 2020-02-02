@@ -25,14 +25,22 @@ const validate = ({ name, code }: Partial<NewActionButtonEditableFields>) => {
   return errors;
 };
 
+const initialCode = `HelperV1()
+  .activate("Finale")
+  .clickMenuItems([
+    "Tools",
+    "Smart Shape",
+    "Decrescendo"
+  ]);`;
+
 interface Props extends AddButtonFormProps<Button.Action> {
   data: Button.NewButtonInitialData;
 }
 
 const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
-    Add Action Button
     <Form
+      initialValues={{ name: "", icon: "", code: initialCode }}
       onSubmit={(formData: NewActionButtonEditableFields) =>
         onSave({
           ...data,
@@ -51,7 +59,7 @@ const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
         <form onSubmit={handleSubmit}>
           <Paper style={{ padding: 16 }}>
             <Grid container={true} alignItems="flex-start" spacing={8}>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={4}>
                 <Field
                   fullWidth={true}
                   required={true}
@@ -61,7 +69,7 @@ const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
                   label="Button Name"
                 />
               </Grid>
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={8}>
                 <Field
                   fullWidth={true}
                   required={false}
