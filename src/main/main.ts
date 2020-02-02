@@ -5,7 +5,7 @@ const { resolve } = require("app-root-path");
 
 import * as Toggle from "./toggle";
 import * as LocalPersistence from "./local-persistence";
-import Menu from "./menu";
+import * as Menu from "./menu";
 
 app.on("ready", async () => {
   const mainWindow = new BrowserWindow({
@@ -35,7 +35,7 @@ app.on("ready", async () => {
   });
   const url = isDev ? devPath : prodPath;
 
-  ElectronMenu.setApplicationMenu(Menu);
+  ElectronMenu.setApplicationMenu(Menu.generate(app));
   mainWindow.loadURL(url);
 });
 
