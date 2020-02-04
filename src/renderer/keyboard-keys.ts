@@ -60,6 +60,7 @@ export class Hotkeys {
 
   public constructor(keyCallbackMap: KeyListenerCallbackMap) {
     this.keyCallbackMap = keyCallbackMap;
+    this.activate();
   }
 
   private passesKeyUpValidation = (e: any): boolean =>
