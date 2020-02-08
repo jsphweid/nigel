@@ -42,6 +42,16 @@ const HelperV1 = ({ delayTime = 0.01 } = {}) => ({
       clickButton: name => {
         appWindow.buttons[name].click();
         return actions;
+      },
+      spy: () => {
+        console.log("-----ll");
+        // console.log("----", Object.getOwnPropertyNames(appWindow));
+        console.log(
+          "getting buttons",
+          JSON.stringify(appWindow.properties(), null, 2)
+        );
+
+        return actions;
       }
     };
 

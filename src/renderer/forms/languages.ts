@@ -1,5 +1,7 @@
 import { Execution } from "../../shared/types";
 
+export type Language = typeof all[0];
+
 export const all = [
   {
     type: Execution.Type.AppleScript,

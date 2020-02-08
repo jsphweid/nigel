@@ -5,7 +5,7 @@ import { Paper, Grid, Button as MaterialUIButton } from "@material-ui/core";
 import * as Utilities from "../../shared/utilities";
 import TextField from "./text-field";
 import { Button } from "../../shared/types";
-import { AddButtonFormProps } from "./add-button-form";
+import { AddEditModalProps } from "./add-edit-modal";
 
 interface NewTabButtonEditableFields {
   name: string;
@@ -20,16 +20,19 @@ const validate = ({ name }: Partial<NewTabButtonEditableFields>) => {
   return errors;
 };
 
-interface Props extends AddButtonFormProps<Button.Tab> {
-  data: Button.NewButtonInitialData;
-}
+type Props = AddEditModalProps<Button.Tab | Button.NewButtonInitialData>;
+
 const AddTabButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
     <Form
+      initialValues={{
+        name: Button.isTab(data) ? data.name : "",
+        icon: Button.isTab(data) ? data.icon || "" : ""
+      }}
       onSubmit={(formData: NewTabButtonEditableFields) =>
         onSave({
           ...data,
-          id: Utilities.generateRandomID(),
+          id: Button.isTab(data) ? data.id : Utilities.generateRandomID(),
           name: formData.name,
           type: Button.Type.Tab,
           icon: formData.icon || null

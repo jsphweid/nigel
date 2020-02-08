@@ -1,6 +1,9 @@
 import * as React from "react";
 import Editor from "react-simple-code-editor";
-import { highlight, languages } from "prismjs/components/prism-core";
+import {
+  highlight,
+  languages as prismLanguages
+} from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-applescript";
@@ -11,8 +14,11 @@ import {
   MenuItem,
   FormHelperText
 } from "@material-ui/core";
-import * as Languages from "./languages";
 import styled from "styled-components";
+import { pipe } from "@grapheng/prelude";
+
+import * as Languages from "./languages";
+import { Code } from "./edit-action-button-form";
 
 const Container = styled.div`
   display: flex;
@@ -24,10 +30,15 @@ const Container = styled.div`
   }
 `;
 
-export default ({ input: { onChange, value } }: any) => {
-  const [language, setLanguage] = React.useState(Languages.all[2]);
-  const [displaySample, setDisplaySample] = React.useState(!value);
-
+export default ({
+  input: { onChange, value }
+}: {
+  input: { onChange: any; value: Code };
+}) => {
+  const language = React.useMemo(
+    () => Languages.all.find(l => l.type === value.type),
+    [value.type]
+  );
   return (
     <Container>
       <FormControl>
@@ -35,10 +46,11 @@ export default ({ input: { onChange, value } }: any) => {
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={language}
-          onChange={e => {
-            setDisplaySample(true);
-            setLanguage(e.target.value as any);
-          }}
+          onChange={e =>
+            pipe(e.target.value as Languages.Language, language =>
+              onChange({ code: language.sample, type: language.type })
+            )
+          }
         >
           {Languages.all.map(lang => (
             <MenuItem key={lang.name} value={lang as any}>
@@ -49,12 +61,13 @@ export default ({ input: { onChange, value } }: any) => {
         <FormHelperText>Type</FormHelperText>
       </FormControl>
       <Editor
-        value={displaySample ? value?.code || language.sample : value?.code}
+        value={value.code}
         onValueChange={code => {
-          setDisplaySample(false);
-          onChange({ code, type: language.type });
+          onChange({ code, type: value.type });
         }}
-        highlight={code => highlight(code, languages[language.prism])}
+        highlight={code =>
+          highlight(code, prismLanguages[language?.prism || ""])
+        }
         padding={10}
         style={{
           fontFamily: 'iosevka,consolas,"Fira code", "Fira Mono", monospace',

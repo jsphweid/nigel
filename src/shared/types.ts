@@ -69,11 +69,10 @@ export namespace Button {
 
   export type Button = Action | Tab;
 
-  export const isAction = (button: Button): button is Action =>
+  export const isAction = (button: any): button is Action =>
     button.type === Type.Action;
 
-  export const isTab = (button: Button): button is Tab =>
-    button.type === Type.Tab;
+  export const isTab = (button: any): button is Tab => button.type === Type.Tab;
 }
 
 export namespace Board {

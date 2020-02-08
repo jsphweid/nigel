@@ -8,8 +8,7 @@ import { Button, KeyboardKeys } from "../shared/types";
 import * as RendererExecutor from "./renderer-executor";
 import { UpdateButtonsOnBoard, BoardGetter } from "../shared/services";
 import * as Logic from "./logic";
-import EditButtonForm from "./forms/edit-button-form";
-import AddButtonForm from "./forms/add-button-form";
+import AddEditModal from "./forms/add-edit-modal";
 
 export const GlobalStyles = createGlobalStyle`
   html, body {
@@ -25,15 +24,9 @@ Electron.ipcRenderer.send("getButtons");
 const App = () => {
   const [boardID] = React.useState<string>("board1");
   const [buttons, setButtons] = React.useState<Button.Button[]>([]);
-  const [
-    buttonBeingEdited,
-    setButtonBeingEdited
-  ] = React.useState<Button.Button | null>(null);
-
-  const [
-    addButtonInitialData,
-    setAddButtonInitialData
-  ] = React.useState<Button.NewButtonInitialData | null>(null);
+  const [buttonBeingEdited, setButtonBeingEdited] = React.useState<
+    Button.NewButtonInitialData | Button.Button | null
+  >(null);
 
   React.useEffect(() => {
     BoardGetter.call(boardID);
@@ -59,33 +52,17 @@ const App = () => {
   return (
     <div>
       <GlobalStyles />
-      <EditButtonForm
+      <AddEditModal
         data={buttonBeingEdited}
-        onSave={data => {
-          if (buttonBeingEdited) {
-            updateButtons(
-              Logic.updateButton(buttons, {
-                ...data,
-                id: buttonBeingEdited.id
-              })
-            );
-            setButtonBeingEdited(null);
-          }
+        onSave={newButton => {
+          updateButtons(Logic.upsertButton(buttons, newButton));
+          setButtonBeingEdited(null);
         }}
         onCancel={() => setButtonBeingEdited(null)}
       />
 
-      <AddButtonForm
-        data={addButtonInitialData}
-        onSave={data => {
-          updateButtons(Logic.newButton(buttons, data));
-          setAddButtonInitialData(null);
-        }}
-        onCancel={() => setAddButtonInitialData(null)}
-      />
-
       <Board
-        active={!buttonBeingEdited && !addButtonInitialData}
+        active={!buttonBeingEdited}
         buttons={buttons}
         handleButtonMoved={(button, destinationKey, destinationTabID) =>
           updateButtons(
@@ -101,7 +78,7 @@ const App = () => {
         }
         handleEditButtonClicked={setButtonBeingEdited}
         handleOnDoubleClick={(keyboardKey, tabID) =>
-          setAddButtonInitialData({ keyboardKey, tabID })
+          setButtonBeingEdited({ keyboardKey, tabID })
         }
         handleDeleteButtonClicked={button =>
           updateButtons(Logic.deleteButton(buttons, button.id))

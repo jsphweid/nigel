@@ -157,11 +157,11 @@ describe("logic", () => {
     });
   });
 
-  describe("updateButton", () => {
+  describe("upsertButton", () => {
     test("updates a tab", () => {
       const id = "tab1";
       expect(
-        Logic.updateButton(buttons, {
+        Logic.upsertButton(buttons, {
           id: id,
           name: "jojo",
           icon: "eee"
@@ -177,17 +177,47 @@ describe("logic", () => {
 
     test("updates a button", () => {
       const id = "412da46d-78b3-4235-9546-dd9237883340";
-      expect(
-        Logic.updateButton(buttons, {
-          id: id,
-          name: "jojo",
-          icon: "eee"
-        }).find(withID(id))
-      ).toEqual({
+      const result = Logic.upsertButton(buttons, {
+        id: id,
+        name: "jojo",
+        icon: "eee"
+      });
+      expect(result.find(withID(id))).toEqual({
         icon: "eee",
         id: id,
         keyboardKey: "r",
         name: "jojo",
+        tabID: "tab2",
+        type: "ACTION"
+      });
+
+      expect(result.length).toEqual(buttons.length);
+    });
+
+    test("adds a new tab button", () => {
+      const id = "newTab";
+      const newButtons = Logic.upsertButton(buttons, {
+        ...buttons[0],
+        id
+      });
+      expect(newButtons.find(withID(id))).toEqual({
+        id,
+        keyboardKey: "1",
+        name: "Tab 123",
+        type: "TAB"
+      });
+    });
+
+    test("adds a new action button", () => {
+      const id = "newAction";
+      const newButtons = Logic.upsertButton(buttons, {
+        ...buttons[2],
+        id
+      });
+      expect(newButtons.find(withID(id))).toEqual({
+        id,
+        keyboardKey: "r",
+        name: "Hello World",
         tabID: "tab2",
         type: "ACTION"
       });
@@ -205,37 +235,6 @@ describe("logic", () => {
       const id = "412da46d-78b3-4235-9546-dd9237883340";
       const newButtons = Logic.deleteButton(buttons, id);
       expect(newButtons.find(withID(id))).toEqual(undefined);
-    });
-  });
-
-  describe("newButton", () => {
-    test("adds a new tab button", () => {
-      const id = "newTab";
-      const newButtons = Logic.newButton(buttons, {
-        ...buttons[0],
-        id
-      });
-      expect(newButtons.find(withID(id))).toEqual({
-        id,
-        keyboardKey: "1",
-        name: "Tab 123",
-        type: "TAB"
-      });
-    });
-
-    test("adds a new action button", () => {
-      const id = "newAction";
-      const newButtons = Logic.newButton(buttons, {
-        ...buttons[2],
-        id
-      });
-      expect(newButtons.find(withID(id))).toEqual({
-        id,
-        keyboardKey: "r",
-        name: "Hello World",
-        tabID: "tab2",
-        type: "ACTION"
-      });
     });
   });
 });

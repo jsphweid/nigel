@@ -6,15 +6,21 @@ import CodeEditor from "./code-editor";
 import * as Utilities from "../../shared/utilities";
 import TextField from "./text-field";
 import { Button, Execution } from "../../shared/types";
-import { AddButtonFormProps } from "./add-button-form";
+import { AddEditModalProps } from "./add-edit-modal";
+import * as Languages from "./languages";
 
-interface NewActionButtonEditableFields {
+interface ActionButtonEditableFields {
   name: string;
   code: { code: string; type: Execution.Type };
   icon?: string;
 }
 
-const validate = ({ name, code }: Partial<NewActionButtonEditableFields>) => {
+export interface Code {
+  code: string;
+  type: Execution.Type;
+}
+
+const validate = ({ name, code }: Partial<ActionButtonEditableFields>) => {
   const errors: any = {};
   if (!name) {
     errors.title = "Required";
@@ -25,18 +31,22 @@ const validate = ({ name, code }: Partial<NewActionButtonEditableFields>) => {
   return errors;
 };
 
-interface Props extends AddButtonFormProps<Button.Action> {
-  data: Button.NewButtonInitialData;
-}
+type Props = AddEditModalProps<Button.NewButtonInitialData | Button.Action>;
 
-const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
+const EditActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
     <Form
-      initialValues={{ name: "", icon: "" }}
-      onSubmit={(formData: NewActionButtonEditableFields) =>
+      initialValues={{
+        name: Button.isAction(data) ? data.name : "",
+        icon: Button.isAction(data) ? data.icon || "" : "",
+        code: Button.isAction(data)
+          ? { code: data.executionData.script, type: data.executionData.type }
+          : { code: Languages.all[2].sample, type: Execution.Type.JXA }
+      }}
+      onSubmit={(formData: ActionButtonEditableFields) =>
         onSave({
           ...data,
-          id: Utilities.generateRandomID(),
+          id: Button.isAction(data) ? data.id : Utilities.generateRandomID(),
           executionData: {
             type: formData.code.type,
             script: formData.code.code
@@ -105,4 +115,4 @@ const AddActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   </div>
 );
 
-export default AddActionButtonForm;
+export default EditActionButtonForm;

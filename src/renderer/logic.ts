@@ -7,21 +7,22 @@ export const deleteButton = (
 ): Button.Button[] =>
   Utilities.deepCopy(buttons).filter(button => button.id !== id);
 
-export const newButton = (
+export const upsertButton = (
   buttons: Button.Button[],
-  newButton: Button.Button
-): Button.Button[] => [...buttons, newButton];
-
-export const updateButton = (
-  buttons: Button.Button[],
-  update: Button.EditableFieldsUpdate
+  newButton: { id: string } & Partial<Button.Button>
 ): Button.Button[] => {
   const buttonsCopy = Utilities.deepCopy(buttons);
-  const indexOfButton = buttonsCopy.findIndex(
-    button => button.id === update.id
-  );
-  buttonsCopy[indexOfButton] = { ...buttonsCopy[indexOfButton], ...update };
-  return buttonsCopy;
+  const existingIndex = buttonsCopy.findIndex(b => b.id === newButton.id);
+
+  if (existingIndex > -1) {
+    buttonsCopy[existingIndex] = {
+      ...(buttonsCopy[existingIndex] as Button.Button),
+      ...(newButton as any)
+    };
+    return buttonsCopy;
+  }
+
+  return [...buttonsCopy, newButton as Button.Button];
 };
 
 export const moveButton = (

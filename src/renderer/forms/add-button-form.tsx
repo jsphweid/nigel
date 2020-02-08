@@ -7,16 +7,13 @@ import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 
 import { Button } from "../../shared/types";
-import AddActionButtonForm from "./add-action-button-form";
-import AddTabButtonForm from "./add-tab-button-form";
+import EditActionButtonForm from "./edit-action-button-form";
+import EditTabButtonForm from "./edit-tab-button-form";
+import { AddEditModalProps } from "./add-edit-modal";
 
-export interface AddButtonFormProps<T extends Button.Button> {
-  onSave: (data: T) => void;
-  onCancel: () => void;
-  data: Button.NewButtonInitialData | null;
-}
-
-const AddButtonForm = (props: AddButtonFormProps<Button.Button>) => {
+const AddButtonForm = (
+  props: AddEditModalProps<Button.NewButtonInitialData>
+) => {
   const [type, setType] = React.useState<Button.Type | string>(
     Button.Type.Action
   );
@@ -30,9 +27,9 @@ const AddButtonForm = (props: AddButtonFormProps<Button.Button>) => {
   const renderForm = () => {
     switch (type) {
       case Button.Type.Action:
-        return <AddActionButtonForm {...props} data={data} />;
+        return <EditActionButtonForm {...props} data={data} />;
       case Button.Type.Tab:
-        return <AddTabButtonForm {...props} data={data} />;
+        return <EditTabButtonForm {...props} data={data} />;
       default:
         return null;
     }
@@ -43,7 +40,7 @@ const AddButtonForm = (props: AddButtonFormProps<Button.Button>) => {
       ariaHideApp={false}
       isOpen={!!data}
       onRequestClose={props.onCancel}
-      contentLabel="Add Button"
+      contentLabel="Edit Button"
     >
       <FormControl component="fieldset">
         <FormLabel component="legend">Button Type</FormLabel>
