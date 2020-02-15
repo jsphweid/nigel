@@ -60,7 +60,7 @@ export const awayFromNigel = (): Promise<any> => {
       case OS.MAC:
         return Execution.execute({
           type: Types.Execution.Type.AppleScript,
-          script: `
+          content: `
             tell application \"System Events\"
             set frontmost of the first process whose unix id is ${lastActiveWindow.processID} to true
             end tell

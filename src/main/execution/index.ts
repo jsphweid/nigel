@@ -4,6 +4,7 @@ import * as Types from "../../shared/types";
 import * as AppleScript from "./applescript";
 import * as ShellScript from "./shell-script";
 import * as JXA from "./jxa";
+import * as KeyboardMaestro from "./keyboard-maestro";
 
 ipcMain.on("execute", async (event: any, data: Types.Execution.Data) => {
   const result = await execute(data);
@@ -18,6 +19,8 @@ export const execute = (data: Types.Execution.Data): Promise<any> => {
       return ShellScript.run(data);
     case Types.Execution.Type.JXA:
       return JXA.run(data);
+    case Types.Execution.Type.KeyboardMaestro:
+      return KeyboardMaestro.run(data);
     default:
       console.error(
         `Unable to execute script because ${data} doesn't have a handler.`

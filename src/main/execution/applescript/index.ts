@@ -11,5 +11,5 @@ const AppleScriptHelpers = FS.readFileSync(
 export const run = (data: Types.Execution.AppleScript): Promise<string> =>
   runApplescript(`
 ${AppleScriptHelpers}
-${data.script}
+${data.content}
 `);

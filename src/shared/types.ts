@@ -87,7 +87,8 @@ export namespace Execution {
   export enum Type {
     AppleScript = "APPLESCRIPT",
     ShellScript = "SHELLSCRIPT",
-    JXA = "JXA"
+    JXA = "JXA",
+    KeyboardMaestro = "KEYBOARDMAESTRO"
   }
 
   export interface Base {
@@ -97,7 +98,7 @@ export namespace Execution {
   // Bash Script
   export interface ShellScript extends Base {
     type: Type.ShellScript;
-    script: string;
+    content: string;
   }
 
   export const isShellScript = (data: Data): data is ShellScript =>
@@ -106,7 +107,7 @@ export namespace Execution {
   // AppleScript
   export interface AppleScript extends Base {
     type: Type.AppleScript;
-    script: string;
+    content: string;
   }
 
   export const isAppleScript = (data: Data): data is AppleScript =>
@@ -115,10 +116,15 @@ export namespace Execution {
   // JXA
   export interface JXA extends Base {
     type: Type.JXA;
-    script: string;
+    content: string;
+  }
+
+  export interface KeyboardMaestro extends Base {
+    type: Type.KeyboardMaestro;
+    content: string;
   }
 
   export const isJXA = (data: Data): data is JXA => data.type === Type.JXA;
 
-  export type Data = AppleScript | ShellScript | JXA;
+  export type Data = AppleScript | ShellScript | JXA | KeyboardMaestro;
 }

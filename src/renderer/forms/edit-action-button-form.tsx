@@ -33,6 +33,10 @@ const validate = ({ name, code }: Partial<ActionButtonEditableFields>) => {
 
 type Props = AddEditModalProps<Button.NewButtonInitialData | Button.Action>;
 
+const initialSample = Languages.all.find(
+  l => l.type === Execution.Type.AppleScript
+) as Languages.Language;
+
 const EditActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
   <div>
     <Form
@@ -40,8 +44,8 @@ const EditActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
         name: Button.isAction(data) ? data.name : "",
         icon: Button.isAction(data) ? data.icon || "" : "",
         code: Button.isAction(data)
-          ? { code: data.executionData.script, type: data.executionData.type }
-          : { code: Languages.all[2].sample, type: Execution.Type.JXA }
+          ? { code: data.executionData.content, type: data.executionData.type }
+          : { code: initialSample.sample, type: initialSample.type }
       }}
       onSubmit={(formData: ActionButtonEditableFields) =>
         onSave({
@@ -49,7 +53,7 @@ const EditActionButtonForm: React.SFC<Props> = ({ onSave, onCancel, data }) => (
           id: Button.isAction(data) ? data.id : Utilities.generateRandomID(),
           executionData: {
             type: formData.code.type,
-            script: formData.code.code
+            content: formData.code.code
           },
           name: formData.name,
           type: Button.Type.Action,

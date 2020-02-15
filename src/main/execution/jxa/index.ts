@@ -11,5 +11,5 @@ const HelpersV1 = FS.readFileSync(
 export const run = (data: Types.Execution.JXA): Promise<string> =>
   runJxa(`
     ${HelpersV1}
-    ${data.script}
+    ${data.content}
   `);

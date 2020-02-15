@@ -4,7 +4,7 @@ import * as Types from "../../shared/types";
 
 export const run = (data: Types.Execution.ShellScript): Promise<any> =>
   new Promise((resolve, reject) => {
-    Process.exec(data.script, (error, stdout, stderr) => {
+    Process.exec(data.content, (error, stdout, stderr) => {
       if (error) {
         reject(error);
       } else {
