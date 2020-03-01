@@ -21,11 +21,6 @@ export const generate = (app: App) =>
               message: LocalPersistence.getStorageFilePath()
             })
         },
-        {
-          label: "Display Dev Tools for debugging",
-          click: () =>
-            remote.BrowserWindow?.getFocusedWindow()?.webContents.openDevTools()
-        },
         { type: "separator" },
         {
           label: "Quit",

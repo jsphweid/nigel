@@ -1,5 +1,5 @@
 import { format } from "url";
-import { BrowserWindow, app, Menu as ElectronMenu } from "electron";
+import { BrowserWindow, app, Menu as ElectronMenu, remote } from "electron";
 import isDev from "electron-is-dev";
 const { resolve } = require("app-root-path");
 
