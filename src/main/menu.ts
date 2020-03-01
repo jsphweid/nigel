@@ -1,4 +1,4 @@
-import { Menu, App, dialog } from "electron";
+import { Menu, App, dialog, remote } from "electron";
 
 import * as Toggle from "./toggle";
 import * as LocalPersistence from "./local-persistence";
@@ -20,6 +20,11 @@ export const generate = (app: App) =>
               buttons: ["OK"],
               message: LocalPersistence.getStorageFilePath()
             })
+        },
+        {
+          label: "Display Dev Tools for debugging",
+          click: () =>
+            remote.BrowserWindow?.getFocusedWindow()?.webContents.openDevTools()
         },
         { type: "separator" },
         {
