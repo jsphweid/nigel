@@ -10,6 +10,8 @@ import {
 
 const store = new Store();
 
+export const getStorageFilePath = () => store.path;
+
 export const saveBoard = (
   board: Board.Board
 ): TaskEither.TaskEither<Error, Board.Board> =>

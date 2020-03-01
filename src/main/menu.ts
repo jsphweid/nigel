@@ -1,6 +1,7 @@
-import { Menu, App } from "electron";
+import { Menu, App, dialog } from "electron";
 
 import * as Toggle from "./toggle";
+import * as LocalPersistence from "./local-persistence";
 
 export const generate = (app: App) =>
   Menu.buildFromTemplate([
@@ -10,6 +11,15 @@ export const generate = (app: App) =>
         {
           label: "About Application",
           selector: "orderFrontStandardAboutPanel:"
+        },
+        {
+          label: "Display Local Storage Path",
+          click: () =>
+            dialog.showMessageBox({
+              type: "info",
+              buttons: ["OK"],
+              message: LocalPersistence.getStorageFilePath()
+            })
         },
         { type: "separator" },
         {

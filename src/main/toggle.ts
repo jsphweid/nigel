@@ -30,12 +30,16 @@ const getActiveWindow = (): Promise<ActiveWindow | null> =>
 export const setup = (win: BrowserWindow) => {
   nigelWindow = win;
 
-  globalShortcut.register("F13", async () => {
+  const hotkeyFunction = async () => {
     if (win.isFocused()) {
       awayFromNigel().catch(console.error);
     } else {
       toNigel().catch(console.error);
     }
+  };
+
+  ["F13", "Control+`"].forEach(hotkey => {
+    globalShortcut.register(hotkey, hotkeyFunction);
   });
 };
 
